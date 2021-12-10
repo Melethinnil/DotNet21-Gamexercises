@@ -1,4 +1,5 @@
 ﻿You're an administrator for an upcoming event, responsible for managing information about reservations
+	Information: First name, last name, email adress, customer id, "ticket level" (silver/gold/platinum), discount code (different depending on ticket level), special notes (requests/allergies/etc)
 
 You need to take information from incoming messages from attendees, which come automatically, and then input that information into the system
 	this information is sometimes incorrect or incomplete, and you then need to contact the attendee and get the correct information
@@ -35,3 +36,10 @@ Customer satisfaction is displayed as "reviews" given by the customers after the
 
 Customers have a unique ID number, which you use in your commands to reference that customer
 	this ID is shown in messages, attendee list etc
+	there is no programmatic link that keeps message ID and attendee ID the same, if you enter the wrong one, you're screwed
+
+Don't jump from screens to other screens, always return out of the function and back into the main screen
+
+Each screen has a different text color
+
+When the game ends, you get the option to save your stats in a text file, either in a default location or a location of your choice
