@@ -38,7 +38,7 @@ Customers have a unique ID number, which you use in your commands to reference t
 	this ID is shown in messages, attendee list etc
 	there is no programmatic link that keeps message ID and attendee ID the same, if you enter the wrong one, you're screwed
 
-Don't jump from screens to other screens, always return out of the function and back into the main screen
+Each screen method only loops until a valid command for that screen has been entered, it then returns the command for the GameService to handle
 
 Each screen has a different text color
 

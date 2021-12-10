@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Exercise_2.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,10 +29,8 @@ namespace Exercise_2.Services
                 "You must be our newest employee, right? Would you please tell\n" +
                 "me your name?");
 
+            ResetCursor();
             Console.Write("\nSure, my name is "); GameService.PlayerName = Console.ReadLine();
-            //Set a default "name" if not entering a name
-            if (GameService.PlayerName == "")
-                GameService.PlayerName = "you";
 
             Console.Clear();
             Console.WriteLine(
@@ -39,6 +38,7 @@ namespace Exercise_2.Services
                 "You were the one who applied for the prestigeous position of\n" +
                 "Coordination Helper for Urgent Management. Or CHUM, for short.\n" +
                 "The only one who applied, as a matter of fact. Fascinating.");
+            ResetCursor();
             Console.ReadLine();
 
             Console.Clear();
@@ -48,6 +48,7 @@ namespace Exercise_2.Services
                 "You will also need to make sure that the attendees are satisfied,\n" +
                 "by for example adjusting any already-entered information if they\n" +
                 "want to make any changes.");
+            ResetCursor();
             Console.ReadLine();
 
             Console.Clear();
@@ -60,6 +61,7 @@ namespace Exercise_2.Services
                 "customer ID from the message they send you, otherwise there\n" +
                 "will be issues with linking it all together in the system.");
             Console.WriteLine("\n\nYour first assignment starts right now. Good luck.");
+            ResetCursor();
             Console.ReadLine();
 
             LogoScreen();
@@ -95,13 +97,12 @@ namespace Exercise_2.Services
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write("\n\n                                   START GAME");
             Console.ReadLine();
-            MainScreen();
         }
 
         /// <summary>
-        /// The main screen of the game, which shows basic overview information about the event and unread messages.
+        /// The main screen of the game, which shows basic overview information about the event and the commands the player can enter here.
         /// </summary>
-        static void MainScreen()
+        public static string MainScreen()
         {
             Console.Clear();
 
@@ -110,47 +111,65 @@ namespace Exercise_2.Services
             Console.ForegroundColor = ConsoleColor.DarkYellow;
 
             //Show a list of available commands
+            Console.WriteLine("\nAvailable Commands:\n");
+            foreach(Command command in GameService.ValidCommands)
+            {
+                Console.WriteLine($"{command.FullValue().PadRight(ScreenWidth / 3)}{command.Description}");
+            }
 
             //Wait for player command
+            ResetCursor();
+            return Console.ReadLine();
         }
 
         /// <summary>
         /// A screen that shows all received messages, with unread messages highlighted.
         /// </summary>
-        static void MessageListScreen()
+        public static string MessageListScreen()
         {
-            //Show basic event details (age limit, number of attendees, time left, etc) and notification icon
+            Console.Clear();
+
+            StatusBar();
+
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
 
             //Show a list of messages, with unread messages highlighted
+            Console.WriteLine("\nMessages:\n");
+            Console.WriteLine("#".PadRight(5) + "ID".PadRight(10) + "Subject".PadRight(25) + "Message");
+            foreach(Message message in GameService.Messages.AsEnumerable().Reverse())
+            {
+                if(!message.HasBeenRead)
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"{GameService.Messages.IndexOf(message).ToString().PadRight(5)}{message.ID.ToString().PadRight(10)}{message.ShortSubject().PadRight(25)}{message.Summary()}");
+                Console.ForegroundColor= ConsoleColor.DarkCyan;
+            }
 
             //Show a list of available commands
 
             //Wait for player command
+            return Console.ReadLine();
         }
 
         /// <summary>
         /// A screen that shows the text of a specified message.
         /// </summary>
         /// <param name="m">The message to show</param>
-        static void MessageScreen(Message m)
+        public static string MessageScreen(Message m)
         {
-            //Show basic event details (age limit, number of attendees, time left, etc) and notification icon
-
             //Show the information contained in the selected message
 
             //Show a list of available commands
 
             //Wait for player command
+            return Console.ReadLine();
         }
 
         /// <summary>
         /// A screen that allows you to send a message to a customer.
         /// </summary>
         /// <param name="id">The id of the customer you want to send a message to</param>
-        static void SendMessageScreen(int id)
+        public static string SendMessageScreen(int id)
         {
-            //Show basic event details (age limit, number of attendees, time left, etc) and notification icon
-
             //Show the information in the message to be sent
 
             //Show a list of available message subjects
@@ -158,20 +177,20 @@ namespace Exercise_2.Services
             //Show a list of available commands
 
             //Wait for player command
+            return Console.ReadLine();
         }
 
         /// <summary>
         /// A screen that shows a list of all current attendees.
         /// </summary>
-        static void AttendeeListScreen()
+        public static string AttendeeListScreen()
         {
-            //Show basic event details (age limit, number of attendees, time left, etc) and notification icon
-
             //Show a list of attendees with basic details like ID, full name, email adress and discount code
 
             //Show a list of available commands
 
             //Wait for player command
+            return Console.ReadLine();
         }
 
         /// <summary>
@@ -179,10 +198,8 @@ namespace Exercise_2.Services
         /// </summary>
         /// <param name="a">The attendee to show information about</param>
         /// <param name="editMode">True if editing an existing attendee, false if adding a new one</param>
-        static void AttendeeScreen(Attendee a, bool editMode)
+        public static string AttendeeScreen(Attendee a, bool editMode)
         {
-            //Show basic event details (age limit, number of attendees, time left, etc) and notification icon
-
             //Show extended details about the selected attendee
 
             //Show a list of messages sent by the attendee
@@ -190,31 +207,87 @@ namespace Exercise_2.Services
             //Show a list of available commands
 
             //Wait for player command
+            return Console.ReadLine();
         }
 
         /// <summary>
         /// A screen shown at the end of the game, where the player sees their stats, score and customer reviews.
         /// </summary>
-        static void EndScreen()
+        public static void EndScreen()
         {
         }
 
         /// <summary>
-        /// A status bar that shows information basic event information, such as number of attendees and an unread message notification
+        /// A status bar that shows useful at-a-glance information
         /// </summary>
-        static void StatusBar()
+        private static void StatusBar()
         {
-            //Write out a status bar with a left-aligned name, center-aligned remaining time, and right-aligned message notification
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.Write("|:");
-            for (int i = 0; i < ScreenWidth - 4; i++)
-                Console.Write(" ");
-            Console.Write(":|");
+            Console.WriteLine("|:".PadRight(ScreenWidth-2)+":|");
+
+            UpdateStatus(null);
+
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine();
+            Console.WriteLine("|:".PadRight(ScreenWidth - 2, '_') + ":|");
+        }
+
+        public static void UpdateStatus(Object stateInfo)
+        {
+            //Save the current console cursor then set it to top left
+            int[] savedCursosPos = { Console.CursorLeft, Console.CursorTop };
+            Console.SetCursorPosition(0, 1);
+
+            //Save the current foreground color
+            ConsoleColor tempColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.DarkGray;
 
             string nameString = $"|: Welcome, {GameService.PlayerName}.";
-            string attendeeString = $"Total attendees: {EventService.Attendees.Count}";
-            string messageString = $"\u2709 {GameService.NumUnreadMessages} :|";
-            Console.Write($"{nameString} {attendeeString} {messageString}");
+            int timeLeft = GameService.TimeRemaining();
+            string timeString = $"Time Left: {Math.Floor(timeLeft / 60d)}:{timeLeft % 60}";
+            string messageString = $"Messages: {GameService.NumUnreadMessages} ";
+
+            int nameLength = (ScreenWidth - timeString.Length) / 2;
+            int messageLength = ScreenWidth - timeString.Length - nameLength - 2;
+
+            Console.Write($"{nameString.PadRight(nameLength)}{timeString}");
+            if (GameService.NumUnreadMessages > 0)
+                Console.ForegroundColor = ConsoleColor.Gray;
+            Console.Write($"{messageString.PadLeft(messageLength)}");
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine(":|");
+
+            //Restore the cursor position and foreground color
+            Console.SetCursorPosition(savedCursosPos[0], savedCursosPos[1]);
+            Console.ForegroundColor = tempColor;
+        }
+
+        /// <summary>
+        /// Resets the console cursor to the default input location.
+        /// </summary>
+        private static void ResetCursor()
+        {
+            Console.SetCursorPosition(0, ScreenHeight - 1);
+        }
+
+        /// <summary>
+        /// Displays an error message above the input line.
+        /// </summary>
+        public static void ErrorMessage(string message)
+        {
+            //Save the current console cursor then set it to one row above the input line
+            int[] savedCursosPos = { Console.CursorLeft, Console.CursorTop };
+            Console.SetCursorPosition(0, ScreenHeight - 2);
+
+            //Save the current foreground color
+            ConsoleColor tempColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+
+            Console.WriteLine(message);
+
+            //Restore the cursor position and foreground color
+            Console.SetCursorPosition(savedCursosPos[0], savedCursosPos[1]);
+            Console.ForegroundColor = tempColor;
         }
     }
 }
