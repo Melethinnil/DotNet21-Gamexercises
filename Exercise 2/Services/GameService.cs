@@ -15,18 +15,22 @@ namespace Exercise_2.Services
         private static int _timeLimit = 10 * 60;    //The time limit of the game in seconds
         private static DateTime _startTime;
         public static string PlayerName { get; set; } = "you";
+        //A list of the attendees currently registered for the event
+        public static List<Attendee> Attendees { get; private set; } = new List<Attendee>();
+        //A list of all the possible people who can send messages and be added to the attendee list
+        public static List<Attendee> Customers { get; private set; } = new List<Attendee>();
         public static List<Message> Messages { get; set; } = new List<Message>();
         public static ushort NumUnreadMessages { get; private set; }
         public static Command[] ValidCommands { get; private set; } =
         {
-                new Command("messages", "Show a list of received messages"),
-                new Command("attendees", "Show a list of all current attendees"),
+                new Command("messages", "Show a list of received messages", Enum.GetValues(typeof(Screen)).Cast<Screen>().Where(screen => screen != Screen.MessageListScreen).ToList()),
+                new Command("attendees", "Show a list of all current attendees", Enum.GetValues(typeof(Screen)).Cast<Screen>().Where(screen => screen != Screen.AttendeeListScreen).ToList()),
                 new Command("read message", "Read the message with the specified number", "[number]"),
                 new Command("send message", "Send a message to the specified customer ID", "[id]"),
                 new Command("view attendee", "View attendee details for the specified customer ID", "[id]"),
-                new Command("next", "Go to the next page of the current screen"),
-                new Command("prev", "Go to the previous page of the current screen"),
-                new Command("menu", "return to the main menu")
+                new Command("next", "Go to the next page of the current screen", new List<Screen>(){Screen.MessageListScreen, Screen.AttendeeListScreen}),
+                new Command("prev", "Go to the previous page of the current screen", new List<Screen>(){Screen.MessageListScreen, Screen.AttendeeListScreen}),
+                new Command("menu", "return to the main menu", Enum.GetValues(typeof(Screen)).Cast<Screen>().Where(screen => screen != Screen.MainScreen).ToList())
         };
 
         /// <summary>
@@ -40,20 +44,38 @@ namespace Exercise_2.Services
 
             Timer statusUpdater = new Timer(UIService.UpdateStatus, new AutoResetEvent(false), 1000, 1000);
 
+            GenerateCustomers();
+
             TestSetup();
 
             MainLoop();
         }
 
+        private static void GenerateCustomers()
+        {
+            for (int i = 0; i < 150; i++)
+            {
+                Customers.Add(new Attendee());
+            }
+        }
+
         /// <summary>
         /// Adds some placeholder messages and attendees for testing purposes
         /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
         private static void TestSetup()
         {
-            Messages.Add(new Message(GenerateUniqueNumber(), "Remove reservation", "Hi! I want to remove my reservation for the event."));
-            Messages[0].Read();
-            Messages.Add(new Message(GenerateUniqueNumber(), "i sent the wrong information sorry", "i accidentally sent the wrong information. my last name is supposed to be haraldsson, can you please change it?"));
+            for (int i = 0; i < 15; i++)
+            {
+                Messages.Add(Customers[RandomService.random.Next(Customers.Count-1)].SendMessage());
+                if (i <= 9)
+                    Messages[i].Read();
+            }
+            NumUnreadMessages = CountUnreadMessages();
+        }
+
+        private static ushort CountUnreadMessages()
+        {
+            return (ushort)Messages.Where(m => !m.HasBeenRead).Count();
         }
 
         /// <summary>
@@ -66,19 +88,30 @@ namespace Exercise_2.Services
             while (TimeRemaining() > 0)
             {
                 if (command == "messages")
-                    command = UIService.MessageListScreen();
+                {
+                    UIService.FirstPage();
+                    command = UIService.MessageListScreen().ToLower();
+                }
                 else if (command == "attendees")
-                    command = UIService.AttendeeListScreen();
+                {
+                    UIService.FirstPage();
+                    command = UIService.AttendeeListScreen().ToLower();
+                }
                 else if (command == "menu")
-                    command = UIService.MainScreen();
+                {
+                    command = UIService.MainScreen().ToLower();
+                }
+                else if (command == "next")
+                {
+                    UIService.NextPage();
+                    command = UIService.Redraw().ToLower();
+                }
+                else if (command == "prev")
+                {
+                    UIService.PrevPage();
+                    command = UIService.Redraw().ToLower();
+                }
             }
-        }
-
-        public static ushort GenerateUniqueNumber()
-        {
-            //NOT YET IMPLEMENTED
-            //Generate a random unique number between 10,000 and 65535
-            return 10000;
         }
 
         /// <summary>

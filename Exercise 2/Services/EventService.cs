@@ -6,6 +6,13 @@ using System.Threading.Tasks;
 
 namespace Exercise_2.Services
 {
+    public enum TicketClass
+    {
+        Silver,
+        Gold,
+        Platinum
+    }
+
     /// <summary>
     /// Service responsible for handling event details, such as attendee information
     /// </summary>

@@ -1,4 +1,6 @@
-﻿internal class Message
+﻿using Exercise_2.Services;
+
+internal class Message
 {
     public ushort ID { get; set; }
     public string Subject { get; set; }
@@ -38,5 +40,10 @@
             return Subject.Substring(0, 17) + "...";
         else
             return Subject;
+    }
+
+    public static Message Random()
+    {
+        return new Message(RandomService.ID(), "subject", "message");
     }
 }

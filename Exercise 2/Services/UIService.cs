@@ -7,13 +7,27 @@ using System.Threading.Tasks;
 
 namespace Exercise_2.Services
 {
+    public enum Screen
+    {
+        MainScreen,
+        MessageListScreen,
+        MessageScreen,
+        SendMessageScreen,
+        AttendeeListScreen,
+        AttendeeScreen
+    }
+
     /// <summary>
     /// Service responsible for displaying things to the player and read commands
     /// </summary>
     internal class UIService
     {
+        private static byte _maxMessagesPerScreen = 8;
+        private static byte _maxAttendeesPerScreen = 8;
+        private static byte _page = 0;
         public static int ScreenWidth { get; private set; } = 80;
-        public static int ScreenHeight { get; private set; } = 25;
+        public static int ScreenHeight { get; private set; } = 26;
+        public static Screen CurrentScreen { get; set; } = Screen.MainScreen;
 
         /// <summary>
         /// The intro before the game, presenting the player with instructions and some story.
@@ -30,7 +44,10 @@ namespace Exercise_2.Services
                 "me your name?");
 
             ResetCursor();
-            Console.Write("\nSure, my name is "); GameService.PlayerName = Console.ReadLine();
+            Console.Write("\nSure, my name is ");
+            string name = Console.ReadLine();
+            if (name != "")
+                GameService.PlayerName = name;
 
             Console.Clear();
             Console.WriteLine(
@@ -108,16 +125,14 @@ namespace Exercise_2.Services
 
             StatusBar();
 
+            CurrentScreen = Screen.MainScreen;
+
             Console.ForegroundColor = ConsoleColor.DarkYellow;
 
             //Show a list of available commands
-            Console.WriteLine("\nAvailable Commands:\n");
-            foreach(Command command in GameService.ValidCommands)
-            {
-                Console.WriteLine($"{command.FullValue().PadRight(ScreenWidth / 3)}{command.Description}");
-            }
+            ListCommands(Screen.MainScreen);
 
-            //Wait for player command
+            //Wait for player command and return the command if valid, otherwise loop back to the start of the screen
             ResetCursor();
             return Console.ReadLine();
         }
@@ -131,22 +146,29 @@ namespace Exercise_2.Services
 
             StatusBar();
 
+            CurrentScreen = Screen.MessageListScreen;
+
             Console.ForegroundColor = ConsoleColor.DarkCyan;
 
-            //Show a list of messages, with unread messages highlighted
-            Console.WriteLine("\nMessages:\n");
+            //Show a list of messages (newest first), with unread messages highlighted
+            //Console.WriteLine("\nMessages:\n");
+            Console.WriteLine();
             Console.WriteLine("#".PadRight(5) + "ID".PadRight(10) + "Subject".PadRight(25) + "Message");
-            foreach(Message message in GameService.Messages.AsEnumerable().Reverse())
+            int startIndex = GameService.Messages.Count - 1 - _maxMessagesPerScreen * _page;
+            for (int i = startIndex; i >= startIndex - _maxMessagesPerScreen && i >= 0; i--)
             {
-                if(!message.HasBeenRead)
+                Message message = GameService.Messages[i];
+                if (!message.HasBeenRead)
                     Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine($"{GameService.Messages.IndexOf(message).ToString().PadRight(5)}{message.ID.ToString().PadRight(10)}{message.ShortSubject().PadRight(25)}{message.Summary()}");
-                Console.ForegroundColor= ConsoleColor.DarkCyan;
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
             }
 
             //Show a list of available commands
+            ListCommands(Screen.MessageListScreen);
 
-            //Wait for player command
+            //Wait for player command and return the command if valid, otherwise loop back to the start of the screen
+            ResetCursor();
             return Console.ReadLine();
         }
 
@@ -156,11 +178,17 @@ namespace Exercise_2.Services
         /// <param name="m">The message to show</param>
         public static string MessageScreen(Message m)
         {
+            Console.Clear();
+
+            StatusBar();
+
+            CurrentScreen = Screen.MessageScreen;
             //Show the information contained in the selected message
 
             //Show a list of available commands
 
-            //Wait for player command
+            //Wait for player command and return the command if valid, otherwise loop back to the start of the screen
+            ResetCursor();
             return Console.ReadLine();
         }
 
@@ -170,13 +198,19 @@ namespace Exercise_2.Services
         /// <param name="id">The id of the customer you want to send a message to</param>
         public static string SendMessageScreen(int id)
         {
+            Console.Clear();
+
+            StatusBar();
+
+            CurrentScreen = Screen.SendMessageScreen;
             //Show the information in the message to be sent
 
             //Show a list of available message subjects
 
             //Show a list of available commands
 
-            //Wait for player command
+            //Wait for player command and return the command if valid, otherwise loop back to the start of the screen
+            ResetCursor();
             return Console.ReadLine();
         }
 
@@ -185,11 +219,17 @@ namespace Exercise_2.Services
         /// </summary>
         public static string AttendeeListScreen()
         {
+            Console.Clear();
+
+            StatusBar();
+
+            CurrentScreen = Screen.AttendeeListScreen;
             //Show a list of attendees with basic details like ID, full name, email adress and discount code
 
             //Show a list of available commands
 
-            //Wait for player command
+            //Wait for player command and return the command if valid, otherwise loop back to the start of the screen
+            ResetCursor();
             return Console.ReadLine();
         }
 
@@ -200,13 +240,19 @@ namespace Exercise_2.Services
         /// <param name="editMode">True if editing an existing attendee, false if adding a new one</param>
         public static string AttendeeScreen(Attendee a, bool editMode)
         {
+            Console.Clear();
+
+            StatusBar();
+
+            CurrentScreen = Screen.AttendeeScreen;
             //Show extended details about the selected attendee
 
             //Show a list of messages sent by the attendee
 
             //Show a list of available commands
 
-            //Wait for player command
+            //Wait for player command and return the command if valid, otherwise loop back to the start of the screen
+            ResetCursor();
             return Console.ReadLine();
         }
 
@@ -223,7 +269,7 @@ namespace Exercise_2.Services
         private static void StatusBar()
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
-            Console.WriteLine("|:".PadRight(ScreenWidth-2)+":|");
+            Console.WriteLine("|:".PadRight(ScreenWidth - 2) + ":|");
 
             UpdateStatus(null);
 
@@ -263,11 +309,85 @@ namespace Exercise_2.Services
         }
 
         /// <summary>
+        /// Lists all the available commands for a given screen.
+        /// </summary>
+        /// <param name="screen">The current screen</param>
+        private static void ListCommands(Screen screen)
+        {
+            //ConsoleColor tempColor = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+
+            List<Command> validCommands = GetValidCommands(screen);
+            Console.SetCursorPosition(0, ScreenHeight - 12);
+            Console.WriteLine("\nAvailable Commands:");
+            foreach (Command command in validCommands)
+                Console.WriteLine($"{command.FullValue().PadRight(ScreenWidth / 3)}{command.Description}");
+
+            //Console.ForegroundColor = tempColor;
+        }
+
+        private static List<Command> GetValidCommands(Screen screen)
+        {
+            return GameService.ValidCommands.Where(c => c.ValidIn.Contains(screen)).ToList();
+        }
+
+        /// <summary>
         /// Resets the console cursor to the default input location.
         /// </summary>
         private static void ResetCursor()
         {
             Console.SetCursorPosition(0, ScreenHeight - 1);
+        }
+
+        /// <summary>
+        /// Moves to the next page, depending on the contents of the given screen.
+        /// </summary>
+        /// <param name="screen">The screen to use for limiting the page numbers</param>
+        public static void NextPage()
+        {
+            switch (CurrentScreen)
+            {
+                case Screen.MessageListScreen:
+                    if (GameService.Messages.Count - _maxMessagesPerScreen * (_page + 1) > 0)
+                        _page++;
+                    break;
+                case Screen.AttendeeListScreen:
+                    if (EventService.Attendees.Count - _maxAttendeesPerScreen * (_page + 1) > 0)
+                        _page++;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Moves to the previous page.
+        /// </summary>
+        public static void PrevPage()
+        {
+            _page = (byte)Math.Max(_page - 1, 0);
+        }
+
+        /// <summary>
+        /// Sets the current page to the first page.
+        /// </summary>
+        public static void FirstPage()
+        {
+            _page = 0;
+        }
+
+        /// <summary>
+        /// Redraws the current screen.
+        /// </summary>
+        internal static string Redraw()
+        {
+            switch(CurrentScreen)
+            {
+                case Screen.MessageListScreen:
+                    return MessageListScreen();
+                case Screen.AttendeeListScreen:
+                    return AttendeeListScreen();
+                default:
+                    return "menu";
+            }
         }
 
         /// <summary>
