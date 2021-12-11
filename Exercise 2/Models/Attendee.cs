@@ -1,4 +1,5 @@
-﻿using Exercise_2.Services;
+﻿using Exercise_2.Models;
+using Exercise_2.Services;
 
 internal class Attendee
 {
@@ -34,10 +35,9 @@ internal class Attendee
         Message m;
 
         if (_sentMessages == 0)
-            m = new Message(ID, RandomService.MessageSubject(true), $"{RandomService.MessageGreeting()} {RandomService.MessageName()} {FirstName} {LastName}{RandomService.MessageAttendText()}" +
-                $"I'm {Age} years old. I want a {Ticket} ticket. {SpecialNotes}");
+            m = new Message(ID, MessageType.Booking, RandomService.MessageSubject(MessageType.Booking), $"{RandomService.MessageGreeting()} {RandomService.MessageName()} {FirstName} {LastName}{RandomService.MessageAttendText()}. I'm {Age} years old. I want a {Ticket} ticket. {SpecialNotes}");
         else
-            m = new Message(ID, "Random Subject", "Random contents");
+            m = new Message(ID, MessageType.WrongInfo, "Random Subject", "Random contents");
 
         _sentMessages++;
         return m;

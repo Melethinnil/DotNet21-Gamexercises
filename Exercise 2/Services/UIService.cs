@@ -129,6 +129,10 @@ namespace Exercise_2.Services
 
             Console.ForegroundColor = ConsoleColor.DarkYellow;
 
+            //Show event details, such as age limit, number of attendees, etc
+            Console.WriteLine($"\n\nMinimum age of admission: {EventService.AgeLimit}");
+            Console.WriteLine($"Number of attendees:      {EventService.Attendees.Count}");
+
             //Show a list of available commands
             ListCommands(Screen.MainScreen);
 
@@ -183,9 +187,13 @@ namespace Exercise_2.Services
             StatusBar();
 
             CurrentScreen = Screen.MessageScreen;
-            //Show the information contained in the selected message
+            //Show the information contained in the selected message and mark it as read
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine($"\nSubject: {m.Subject}\nCustomer ID: {m.ID}\n\n{m.Contents}");
+            m.Read();
 
             //Show a list of available commands
+            ListCommands(Screen.MessageScreen);
 
             //Wait for player command and return the command if valid, otherwise loop back to the start of the screen
             ResetCursor();
@@ -290,16 +298,21 @@ namespace Exercise_2.Services
 
             string nameString = $"|: Welcome, {GameService.PlayerName}.";
             int timeLeft = GameService.TimeRemaining();
-            string timeString = $"Time Left: {Math.Floor(timeLeft / 60d)}:{timeLeft % 60}";
-            string messageString = $"Messages: {GameService.NumUnreadMessages} ";
+            string timeString = $"{Math.Floor(timeLeft / 60d).ToString().PadLeft(2,'0')}:{(timeLeft % 60).ToString().PadLeft(2, '0')}";
+            string messageString = $"Messages: {GameService.CountUnreadMessages()} ";
 
             int nameLength = (ScreenWidth - timeString.Length) / 2;
             int messageLength = ScreenWidth - timeString.Length - nameLength - 2;
 
-            Console.Write($"{nameString.PadRight(nameLength)}{timeString}");
-            if (GameService.NumUnreadMessages > 0)
+            Console.Write(nameString.PadRight(nameLength));
+            if (GameService.TimeRemaining() <= 60 || GameService.TimeRemaining() == 120 || GameService.TimeRemaining() == 90)
+                Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write(timeString);
+            if (GameService.CountUnreadMessages() > 0)
                 Console.ForegroundColor = ConsoleColor.Gray;
-            Console.Write($"{messageString.PadLeft(messageLength)}");
+            else
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.Write(messageString.PadLeft(messageLength));
             Console.ForegroundColor = ConsoleColor.DarkGray;
             Console.WriteLine(":|");
 

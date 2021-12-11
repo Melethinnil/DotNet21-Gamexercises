@@ -18,6 +18,7 @@ namespace Exercise_2.Services
     /// </summary>
     internal class EventService
     {
+        public static int AgeLimit { get; private set; } = RandomService.random.Next(8, 21);
         public static List<Attendee> Attendees { get; private set; } = new List<Attendee>();
     }
 }

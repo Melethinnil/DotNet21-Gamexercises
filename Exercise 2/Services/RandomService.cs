@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Exercise_2.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -250,6 +251,16 @@ namespace Exercise_2.Services
             "corn",
             "meat"
         };
+        private static List<string> _subjectsReservation = new()
+        {
+            "Reservation",
+            "Attend",
+            "Attend the event",
+            "I want to attend",
+            "Booking",
+            "Ticket reservation",
+            "Ticket booking"
+        };
 
         public static ushort ID()
         {
@@ -260,7 +271,7 @@ namespace Exercise_2.Services
                     _uniqueIDs.Add(i);
             }
 
-            int index = random.Next(0, _uniqueIDs.Count-1);
+            int index = random.Next(_uniqueIDs.Count);
             ushort id = _uniqueIDs[index];
             _uniqueIDs.RemoveAt(index);
             return id;
@@ -268,15 +279,20 @@ namespace Exercise_2.Services
 
         internal static string SpecialNotes()
         {
-            int generateNotes = random.Next(0, 2);
-            if (generateNotes > 0)
+            bool generateNotes = random.Next(100) >= 50;
+            if (generateNotes)
             {
-                string notes = _specialNotesPrefixes[random.Next(_specialNotesPrefixes.Count - 1)] + " ";
-                int numNotes = random.Next(0, 4);
+                string notes = _specialNotesPrefixes[random.Next(_specialNotesPrefixes.Count)] + " ";
+                int numNotes = random.Next(1, 4);
+                List<string> subjects = new List<string>(_specialNotesSubjects);
                 for(int i = 0; i < numNotes; i++)
                 {
-                    notes += _specialNotesSubjects[random.Next(0, _specialNotesSubjects.Count - 1)];
-                    if (i < numNotes - 1)
+                    int index = random.Next(0, subjects.Count);
+                    notes += subjects[index];
+                    subjects.RemoveAt(index);
+                    if (i < numNotes - 2)
+                        notes += ", ";
+                    else if (i < numNotes - 1)
                         notes += " and ";
                     else
                         notes += ".";
@@ -301,7 +317,7 @@ namespace Exercise_2.Services
         internal static string Email(string firstName, string lastName)
         {
             int type = random.Next(0, 6);
-            string domain = _emailDomains[random.Next(0, _emailDomains.Count-1)];
+            string domain = _emailDomains[random.Next(_emailDomains.Count)];
             switch (type)
             {
                 case 0:
@@ -313,7 +329,7 @@ namespace Exercise_2.Services
                 case 3:
                     return $"{firstName.ToLower()}_{lastName.ToLower()}@{domain}";
                 case 4:
-                    return $"{firstName.ToLower().Substring(0,3)}{firstName.ToLower().Substring(0, 3)}{random.Next(10, 100)}@{domain}";
+                    return $"{firstName.ToLower().Substring(0, Math.Min(firstName.Length, 3))}{lastName.ToLower().Substring(0, Math.Min(lastName.Length, 3))}{random.Next(10, 100)}@{domain}";
                 default:
                     return $"{firstName.ToLower()}_{lastName.ToLower()[0]}@{domain}";
             }
@@ -321,31 +337,44 @@ namespace Exercise_2.Services
 
         internal static string LastName()
         {
-            int index = random.Next(0, _lastNames.Count - 1);
+            int index = random.Next(_lastNames.Count);
             return _lastNames[index];
         }
 
         internal static string FirstName()
         {
-            int index = random.Next(0, _firstNames.Count-1);
+            int index = random.Next(_firstNames.Count);
             return _firstNames[index];
         }
 
-        internal static string MessageSubject(bool firstMessage)
+        internal static MessageType RandomMessageType()
         {
-            if(firstMessage)
+            Array types = Enum.GetValues(typeof(MessageType));
+            return (MessageType)types.GetValue(random.Next(types.Length));
+        }
+
+        internal static string MessageSubject(MessageType type)
+        {
+            switch(type)
             {
-                return "Reservation";
-            }
-            else
-            {
-                return "Random Subject";
+                case MessageType.Booking:
+                    return _subjectsReservation[random.Next(_subjectsReservation.Count)];
+                case MessageType.Unbooking:
+                    return "";
+                case MessageType.MissingInfo:
+                    return "";
+                case MessageType.WrongInfo:
+                    return "";
+                case MessageType.ChangeTicket:
+                    return "";
+                default:
+                    return "";
             }
         }
 
         internal static string MessageAttendText()
         {
-            return " and I want to attend the event.";
+            return " and I want to attend the event";
         }
 
         internal static string MessageName()
