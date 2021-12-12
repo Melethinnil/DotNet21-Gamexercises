@@ -1,9 +1,12 @@
 ﻿using Exercise_2.Models;
 using Exercise_2.Services;
+using System.Timers;
 
 internal class Attendee
 {
     private int _sentMessages = 0;
+    public bool Attending { get; private set; } = false;
+
     public string Name { get; set; }
     public int Age { get; set; }
     public ushort ID { get; private set; }
@@ -35,17 +38,54 @@ internal class Attendee
         DiscountCode = code;
     }
 
-    public Message SendMessage()
+    public void SendMessage()
     {
-        Message m;
+        Message m = null;
 
         if (_sentMessages == 0)
-            m = new Message(ID, MessageType.Booking, RandomService.MessageSubject(MessageType.Booking), $"{RandomService.MessageGreeting()} {RandomService.MessageName()} {Name}{RandomService.MessageAttendText()}. I'm {Age} years old. I want a {Ticket} ticket. {RandomService.AllergyText(Allergies)}");
+        {
+            Attending = true;
+            m = new Message(ID, MessageType.Booking, RandomService.MessageSubject(MessageType.Booking), $"{RandomService.MessageGreeting()} {RandomService.MessageName(Name)}{RandomService.MessageAttendText()}. {RandomService.AgeText(Age)}. I want a {Ticket} ticket. {RandomService.AllergyText(Allergies)}");
+        }
         else
-            m = new Message(ID, MessageType.UpdateInfo, "Random Subject", "Random contents");
+        {
+            MessageType type = RandomService.RandomMessageType();
+            switch (type)
+            {
+                case MessageType.UpdateInfo:
+                    int toChange = RandomService.random.Next(3);
+                    switch (toChange)
+                    {
+                        case 0:
+                            Name = RandomService.FirstName() + " " + RandomService.LastName();
+                            m = new Message(ID, MessageType.UpdateInfo, RandomService.MessageSubject(MessageType.UpdateInfo), RandomService.MessageContents(MessageType.UpdateInfo, "name", Name));
+                            break;
+                        case 1:
+                            Age = RandomService.Age();
+                            m = new Message(ID, MessageType.UpdateInfo, RandomService.MessageSubject(MessageType.UpdateInfo), RandomService.MessageContents(MessageType.UpdateInfo, "age", Age.ToString()));
+                            break;
+                        case 2:
+                            Allergies = RandomService.Allergies();
+                            m = new Message(ID, MessageType.UpdateInfo, RandomService.MessageSubject(MessageType.UpdateInfo), RandomService.MessageContents(MessageType.UpdateInfo, "allergies", GetAllergies()));
+                            break;
+                    }
+                    break;
+                case MessageType.ChangeTicket:
+                    Ticket = RandomService.Ticket(Ticket);
+                    m = new Message(ID, MessageType.ChangeTicket, RandomService.MessageSubject(MessageType.ChangeTicket), RandomService.MessageContents(MessageType.ChangeTicket, "ticket", Ticket.ToString()));
+                    break;
+                case MessageType.Unbooking:
+                    Attending = false;
+                    m = new Message(ID, MessageType.Unbooking, RandomService.MessageSubject(MessageType.Unbooking), RandomService.MessageContents(MessageType.Unbooking));
+                    break;
+            }
+        }
 
-        _sentMessages++;
-        return m;
+        if (m != null)
+        {
+            _sentMessages++;
+            GameService.Messages.Add(m);
+        }
     }
 
     public static Attendee Empty()
@@ -65,15 +105,40 @@ internal class Attendee
         ID = id;
     }
 
+    public string GetAllergies()
+    {
+        if (Allergies.Count == 0)
+            return "I am not allergic to anything";
+
+        string allergyText = "I'm allergic to ";
+        for (int i = 0; i < Allergies.Count; i++)
+        {
+            allergyText += Allergies[i];
+            if (i < Allergies.Count - 2)
+                allergyText += ", ";
+            else if (i < Allergies.Count - 1)
+                allergyText += " and ";
+        }
+        return allergyText;
+    }
+
     public void ReceiveMessage(Message m)
+    {
+        System.Timers.Timer replyTimer = new System.Timers.Timer(RandomService.random.Next(5000, 15000));
+        replyTimer.Elapsed += (sender, e) => Reply(sender, e, m);
+        replyTimer.AutoReset = false;
+        replyTimer.Start();
+    }
+
+    private void Reply(object sender, ElapsedEventArgs e, Message m)
     {
         Message reply = new Message(ID, MessageType.UpdateInfo, $"RE: {m.Subject}", "Okay, here is the correct information.\n");
 
         if (m.requestedInfo.Count > 0)
         {
-            foreach(string request in m.requestedInfo)
+            foreach (string request in m.requestedInfo)
             {
-                switch(request.ToLower())
+                switch (request.ToLower())
                 {
                     case "name":
                         reply.Contents += $"My name is {Name}. ";
@@ -82,19 +147,26 @@ internal class Attendee
                         reply.Contents += $"I am  {Age} years old. ";
                         break;
                     case "allergies":
-                        if (Allergies.Count == 0)
-                            reply.Contents += $"I am not allergic to anything. ";
-                        else
-                            reply.Contents += RandomService.AllergyText(Allergies) + " ";
+                        reply.Contents += $"{GetAllergies()}. ";
                         break;
                 }
             }
         }
-        GameService.Messages.Add(Reply(m));
+        GameService.Messages.Add(reply);
     }
 
-    private Message Reply(Message m)
+    public bool Match(Attendee other)
     {
-        return new Message(ID, MessageType.UpdateInfo, $"RE: {m.Subject}", "I received your message, here is my reply.");
+        if(ID != other.ID)
+            return false;
+        if(Name != other.Name)
+            return false;
+        if(Age != other.Age)
+            return false;
+        if(Ticket != other.Ticket)
+            return false;
+        if(!Enumerable.SequenceEqual(Allergies.OrderBy(e => e), other.Allergies.OrderBy(e => e)))
+            return false;
+        return true;
     }
 }

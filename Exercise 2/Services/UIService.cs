@@ -151,6 +151,8 @@ namespace Exercise_2.Services
                 string command = Console.ReadLine();
                 if (IsValidCommand(command, CurrentScreen))
                     return command;
+                else if (command == "")
+                    return "menu";
                 else
                     _errorMessage = "Command not recognized. Please try again.";
             }
@@ -200,6 +202,8 @@ namespace Exercise_2.Services
                 string command = Console.ReadLine();
                 if (IsValidCommand(command, CurrentScreen))
                     return command;
+                else if (command == "")
+                    return "menu";
                 else
                     _errorMessage = "Command not recognized. Please try again.";
             }
@@ -238,6 +242,8 @@ namespace Exercise_2.Services
                 string command = Console.ReadLine();
                 if (IsValidCommand(command, CurrentScreen))
                     return command;
+                else if (command == "")
+                    return "menu";
                 else
                     _errorMessage = "Command not recognized. Please try again.";
             }
@@ -269,7 +275,7 @@ namespace Exercise_2.Services
                 Console.ForegroundColor = ConsoleColor.Cyan;
 
                 //Show the information in the message to be sent
-                Message message = new Message(id, MessageType.UpdateInfo, "Missing/wrong info", $"Hello, {customer.Name}.\n" +
+                Message message = new Message(id, MessageType.UpdateInfo, "Missing/wrong info", $"Hello!\n" +
                     $"Your request to attend the event contains some missing or erroneous information.\n" +
                     $"Please reply with the following information: {string.Join(", ", requests)}\n\n" +
                     $"Best regards, {GameService.PlayerName}", requests);
@@ -312,6 +318,8 @@ namespace Exercise_2.Services
                     return "menu";
                 }
                 else if (command == "discard")
+                    return "menu";
+                else if (command == "")
                     return "menu";
                 else
                     _errorMessage = "Command not recognized. Please try again.";
@@ -358,6 +366,8 @@ namespace Exercise_2.Services
                 string command = Console.ReadLine();
                 if (IsValidCommand(command, CurrentScreen))
                     return command;
+                else if (command == "")
+                    return "menu";
                 else
                     _errorMessage = "Command not recognized. Please try again.";
             }
@@ -482,6 +492,8 @@ namespace Exercise_2.Services
                 }
                 else if (IsValidCommand(command, CurrentScreen))
                     return command;
+                else if (command == "")
+                    return "menu";
                 else
                     _errorMessage = "Command not recognized. Please try again.";
             }
@@ -492,6 +504,31 @@ namespace Exercise_2.Services
         /// </summary>
         public static void EndScreen()
         {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(@"           _____          __  __ ______    ______      ________ _____  
+          / ____|   /\   |  \/  |  ____|  / __ \ \    / /  ____|  __ \ 
+         | |  __   /  \  | \  / | |__    | |  | \ \  / /| |__  | |__) |
+         | | |_ | / /\ \ | |\/| |  __|   | |  | |\ \/ / |  __| |  _  / 
+         | |__| |/ ____ \| |  | | |____  | |__| | \  /  | |____| | \ \ 
+          \_____/_/    \_\_|  |_|______|  \____/   \/   |______|_|  \_\");
+
+            //Show the total number of attendees for the event at the end
+            Console.WriteLine($"\n\n\nCongratulations! You added {EventService.Attendees.Count} attendees to the event! However...\n");
+            //Show the total number of attendees that wanted to attend but weren't added
+            Console.WriteLine($"\n{Score.NonAddedAttendees} people who wanted to attend the event weren't added.");
+            //Show the number of attendees that had missing or incorrect information at the end
+            Console.WriteLine($"\n{Score.IncorrectInformation} attendees were registered with missing or incorrect information.");
+            //Show the number of underage attendees in the event
+            Console.WriteLine($"\n{Score.UnderageAttendees} attendees were added despite being below the age limit.");
+            //Show the number of attendees that should have been removed but are still in the list
+            Console.WriteLine($"\n{Score.NonRemovedAttendees} asked to be removed but weren't.");
+            //Show the number of attendees that didn't receive a discount code
+            Console.WriteLine($"\n{Score.MissingDiscount} attendees didn't receive their discount code.");
+
+            //Calculate and show the final score
+            Console.WriteLine($"\n\nWhich brings your total score to {Score.TotalScore}!");
+            Console.ReadLine();
         }
 
         /// <summary>

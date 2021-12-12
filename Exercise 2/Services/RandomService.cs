@@ -29,46 +29,46 @@ namespace Exercise_2.Services
             "Iris",
             "Renee",
             "Brenda",
-            "Mandy",
+            "Manda",
             "Ellen",
             "Annie",
             "Naomi",
             "Valerie",
-            "Arlene",
-            "Antoinette",
+            "Theres",
+            "Stephnie",
             "Terry",
             "Gail",
-            "Constance",
+            "Hanna",
             "Katrina",
             "Hannah",
-            "Amanda",
-            "Virginia",
+            "Shelly",
+            "Therese",
             "Patty",
             "Colleen",
             "Joy",
-            "Olga",
+            "Jenny",
             "Kristi",
             "Lynn",
             "Inez",
-            "Candice",
+            "Debora",
             "Della",
             "Blanche",
             "Debra",
             "Jennie",
             "Sandra",
             "Joyce",
-            "Kay",
+            "Susanne",
             "Suzanne",
             "Marsha",
             "Thelma",
             "Bridget",
             "Denise",
             "Emma",
-            "Lynne",
+            "Minny",
             "Minnie",
             "Frank",
             "Marcus",
-            "Clifford",
+            "Markus",
             "Don",
             "Lee",
             "Rickey",
@@ -78,28 +78,28 @@ namespace Exercise_2.Services
             "Ed",
             "Harold",
             "Arnold",
-            "Gustavo",
+            "Ricky",
             "James",
             "Edmund",
             "Fredrick",
-            "Nathaniel",
+            "Frederick",
             "Marlon",
             "Fred",
             "Johnny",
             "Ruben",
             "Donald",
-            "Duane",
+            "Jonny",
             "Devin",
             "Phil",
             "Luther",
-            "Nicolas",
+            "Tedd",
             "Hubert",
             "Allan",
             "Nelson",
             "Ted",
             "Eugene",
             "Julio",
-            "Terrence",
+            "Oskar",
             "Lyle",
             "Oscar",
             "Jake",
@@ -109,7 +109,7 @@ namespace Exercise_2.Services
             "Myron",
             "Pete",
             "Boyd",
-            "Sidney",
+            "Peter",
             "Andre",
             "Thomas",
             "Alfredo",
@@ -145,13 +145,13 @@ namespace Exercise_2.Services
             "Young",
             "Mathis",
             "Thompson",
-            "Todd",
+            "Yung",
             "Hamilton",
-            "Mcgee",
+            "McGee",
             "Bryant",
-            "Sims",
+            "Thomson",
             "Williams",
-            "Mcdaniel",
+            "Clark",
             "Griffin",
             "Ballard",
             "Hoffman",
@@ -178,7 +178,7 @@ namespace Exercise_2.Services
             "Arnold",
             "Floyd",
             "Manning",
-            "Sims",
+            "Wolffe",
             "Banks",
             "Joseph",
             "Wolfe",
@@ -213,7 +213,7 @@ namespace Exercise_2.Services
             "Daniels",
             "Garza",
             "Tucker",
-            "Mclaughlin",
+            "McLaughlin",
             "Stokes",
             "Meyer",
             "Gonzales",
@@ -261,6 +261,50 @@ namespace Exercise_2.Services
             "Ticket reservation",
             "Ticket booking"
         };
+        private static List<string> _subjectsUnReservation = new()
+        {
+            "Changed my mind",
+            "Unbooking",
+            "Remove reservation",
+            "I no longer want to attend",
+            "Delete ticket"
+        };
+        private static List<string> _subjectsWrongInfo = new()
+        {
+            "Oops",
+            "Wrong info",
+            "Forgot something",
+            "Additional info",
+            "Correction"
+        };
+        private static List<string> _subjectsChangeTicket = new()
+        {
+            "Changed my mind",
+            "Change ticket",
+            "I want to change my ticket level",
+            "Different ticket"
+        };
+        private static List<string> _greetings = new()
+        {
+            "Hi!",
+            "Hello!",
+            "Greetings.",
+            "Good day."
+        };
+        private static List<string> _introductions = new()
+        {
+            "I am",
+            "My name is",
+            "I'm"
+        };
+        private static List<string> _attendTexts = new()
+        {
+            " and I want to attend the event",
+            " and I'd like a ticket for the event",
+            ". I want to book a ticket",
+            ". I'd like to attend the event",
+            " and I would like to make a ticket reservation for the event"
+        };
 
         public static ushort ID()
         {
@@ -299,21 +343,27 @@ namespace Exercise_2.Services
 
         internal static string AllergyText(List<string> allergies)
         {
-            if (allergies.Count == 0)
-                return "I am not allergic to anything.";
+            bool omitAllergies = random.Next(100) <= 30;
 
-            string allergyText = _allergyPrefixes[random.Next(_allergyPrefixes.Count)] + " ";
-            for(int i = 0; i < allergies.Count; i++)
+            if (!omitAllergies)
             {
-                allergyText += allergies[i];
-                if (i < allergies.Count - 2)
-                    allergyText += ", ";
-                else if (i < allergies.Count - 1)
-                    allergyText += " and ";
-                else
-                    allergyText += ".";
+                if (allergies.Count == 0)
+                    return "I am not allergic to anything.";
+
+                string allergyText = _allergyPrefixes[random.Next(_allergyPrefixes.Count)] + " ";
+                for (int i = 0; i < allergies.Count; i++)
+                {
+                    allergyText += allergies[i];
+                    if (i < allergies.Count - 2)
+                        allergyText += ", ";
+                    else if (i < allergies.Count - 1)
+                        allergyText += " and ";
+                    else
+                        allergyText += ".";
+                }
+                return allergyText; 
             }
-            return allergyText;
+            return "";
         }
 
         internal static TicketClass Ticket()
@@ -322,9 +372,22 @@ namespace Exercise_2.Services
             return (TicketClass)values.GetValue(random.Next(values.Length));
         }
 
+        internal static TicketClass Ticket(TicketClass except)
+        {
+            List<TicketClass> values = ((TicketClass[])Enum.GetValues(typeof(TicketClass))).ToList();
+            values.Remove(except);
+            return values[random.Next(values.Count)];
+        }
+
         internal static int Age()
         {
-            return random.Next(14, 100);
+            //return a random age, weighted towards younger ages
+            bool older = random.Next(100) <= 30;
+            if(older)
+                return random.Next(40, 100);
+            else
+                return random.Next(14, 40);
+
         }
 
         internal static string Email(string firstName, string lastName)
@@ -373,11 +436,11 @@ namespace Exercise_2.Services
                 case MessageType.Booking:
                     return _subjectsReservation[random.Next(_subjectsReservation.Count)];
                 case MessageType.Unbooking:
-                    return "";
+                    return _subjectsUnReservation[random.Next(_subjectsUnReservation.Count)];
                 case MessageType.UpdateInfo:
-                    return "";
+                    return _subjectsWrongInfo[random.Next(_subjectsWrongInfo.Count)];
                 case MessageType.ChangeTicket:
-                    return "";
+                    return _subjectsChangeTicket[random.Next(_subjectsChangeTicket.Count)];
                 default:
                     return "";
             }
@@ -385,17 +448,85 @@ namespace Exercise_2.Services
 
         internal static string MessageAttendText()
         {
-            return " and I want to attend the event";
+            return _attendTexts[random.Next(_attendTexts.Count)];
         }
 
-        internal static string MessageName()
+        internal static string MessageName(string name)
         {
-            return "My name is";
+            bool misSpelled = random.Next(100) <= 20;
+            if(misSpelled)
+            {
+                char[] temp = name.ToCharArray();
+                temp[random.Next(temp.Length)] = RandomChar();
+                name = new string(temp);
+            }
+            else
+            {
+                bool skipLast = random.Next(100) <= 30;
+                if (skipLast)
+                    name = name.Split(' ')[0].ToString();
+            }
+            return _introductions[random.Next(_introductions.Count)] + " " + name;
+        }
+
+        private static char RandomChar()
+        {
+            return (char)random.Next('a', 'z');
         }
 
         internal static string MessageGreeting()
         {
-            return "Hi!";
+            return _greetings[random.Next(_greetings.Count)];
+        }
+
+        internal static string MessageContents(MessageType type, string changedInfo = "", string changeValue = "")
+        {
+            switch(type)
+            {
+                case MessageType.UpdateInfo:
+                    switch(changedInfo)
+                    {
+                        case "name":
+                            return $"I accidentally gave you the wrong name. My actual name is {changeValue}.";
+                        case "age":
+                            return $"I accidentally gave you the wrong age. I'm actually {changeValue} years old.";
+                        case "allergies":
+                            return $"I accidentally gave you the wrong list of allergies. I'm actually allergic to {changeValue}.";
+                    }
+                    break;
+                case MessageType.ChangeTicket:
+                    return $"I want to change to a {changeValue} ticket.";
+                case MessageType.Unbooking:
+                    return "I no longer want to attend the event.";
+            }
+
+            return "";
+        }
+
+        internal static string AgeText(int age)
+        {
+            int style = random.Next(3);
+            switch (style)
+            {
+                case 0:
+                    return $"I am {age} years old";
+                case 1:
+                    return $"I was born in {DateTime.Now.Year - age}";
+                case 2:
+                    bool error = random.Next(100) <= 20;
+                    if (error)
+                    {
+                        bool wrongAge = random.Next(100) <= 50;
+                        if (wrongAge)
+                            return $"I was born in {DateTime.Now.Year - age}, so I'm {age + random.Next(-8, 11)}";
+                        else
+                            return $"I was born in {DateTime.Now.Year - age + random.Next(-8, 11)}, so I'm {age}";
+                    }
+                    else
+                        return $"I was born in {DateTime.Now.Year - age}, so I'm {age}";
+                default:
+                    return $"I'm {age}";
+            }
         }
     }
 }

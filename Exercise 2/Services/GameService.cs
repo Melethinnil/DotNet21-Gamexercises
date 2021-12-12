@@ -12,8 +12,11 @@ namespace Exercise_2.Services
     /// </summary>
     internal class GameService
     {
-        private static int _timeLimit = 10 * 60;    //The time limit of the game in seconds
+        private static int _timeLimit = 20 * 60;    //The time limit of the game in seconds
+        private static int _maxMessageInterval = 90000; //The maximum possible interval between messages in milliseconds
         private static DateTime _startTime;
+        private static System.Timers.Timer _messageTimer;
+        private static Timer _statusUpdateTimer;
         public static string PlayerName { get; set; } = "you";
         //A list of the attendees currently registered for the event
         public static List<Attendee> Attendees { get; private set; } = new List<Attendee>();
@@ -42,11 +45,15 @@ namespace Exercise_2.Services
 
             _startTime = DateTime.Now;
 
-            Timer statusUpdater = new Timer(UIService.UpdateStatus, new AutoResetEvent(false), 1000, 1000);
+            _statusUpdateTimer = new Timer(UIService.UpdateStatus, new AutoResetEvent(false), 1000, 1000);
+            _messageTimer = new System.Timers.Timer(RandomService.random.Next(30000, _maxMessageInterval));
+            _messageTimer.Elapsed += (sender, e) => SendMessage(sender, e);
+            _messageTimer.AutoReset = true;
+            _messageTimer.Start();
 
             GenerateCustomers();
 
-            TestSetup();
+            InitialMessages();
 
             MainLoop();
         }
@@ -60,14 +67,21 @@ namespace Exercise_2.Services
         }
 
         /// <summary>
-        /// Adds some placeholder messages and attendees for testing purposes
+        /// Adds some messages to start the game with
         /// </summary>
-        private static void TestSetup()
+        private static void InitialMessages()
         {
-            for (int i = 0; i < 15; i++)
+            for (int i = 0; i < 1; i++)
             {
-                Messages.Add(Customers[RandomService.random.Next(Customers.Count)].SendMessage());
+                Customers[RandomService.random.Next(Customers.Count)].SendMessage();
             }
+        }
+
+        private static void SendMessage(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            Customers[RandomService.random.Next(Customers.Count)].SendMessage();
+            _messageTimer.Interval = RandomService.random.Next(30000, _maxMessageInterval);
+            _maxMessageInterval -= RandomService.random.Next(100, 500);
         }
 
         public static ushort CountUnreadMessages()
@@ -143,6 +157,9 @@ namespace Exercise_2.Services
                 }
             }
 
+            _statusUpdateTimer.Dispose();
+            _messageTimer.Stop();
+            Score.Calculate();
             UIService.EndScreen();
         }
 
@@ -152,7 +169,7 @@ namespace Exercise_2.Services
         /// <returns>The remaining time in whole seconds.</returns>
         public static int TimeRemaining()
         {
-            return (int)Math.Ceiling((_startTime.AddSeconds((double)_timeLimit) - DateTime.Now).TotalSeconds);
+            return (int)Math.Max(0, Math.Ceiling((_startTime.AddSeconds((double)_timeLimit) - DateTime.Now).TotalSeconds));
         }
     }
 }

@@ -51,7 +51,7 @@ namespace Exercise_2.Models
         public string Summary()
         {
             if (Contents.Length > 30)
-                return Contents.Substring(0, 27) + "...";
+                return Contents.Substring(0, 27).Replace("\n", "") + "...";
             else
                 return Contents;
         }
