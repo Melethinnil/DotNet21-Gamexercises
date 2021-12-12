@@ -25,6 +25,7 @@ namespace Exercise_2.Services
         private static byte _maxMessagesPerScreen = 8;
         private static byte _maxAttendeesPerScreen = 8;
         private static byte _page = 0;
+        private static string _errorMessage = "";
         public static int ScreenWidth { get; private set; } = 80;
         public static int ScreenHeight { get; private set; } = 26;
         public static Screen CurrentScreen { get; set; } = Screen.MainScreen;
@@ -70,13 +71,13 @@ namespace Exercise_2.Services
 
             Console.Clear();
             Console.WriteLine(
-                "For each attendee, we require their first and last names, email\n" +
-                "adress, which class of ticket they want, and possibly special\n" +
-                "notes such as allergies. They are also eligible for a personal\n" +
-                "discount code depending on their ticket class, so you'll need\n" +
-                "to create those codes as well. And don't forget to enter the\n" +
-                "customer ID from the message they send you, otherwise there\n" +
-                "will be issues with linking it all together in the system.");
+                "For each attendee, we require their first and last names, age,\n" +
+                "which class of ticket they want, and whether or not they have\n" +
+                "any allergies. They are also eligible for a personal discount\n" +
+                "code depending on their ticket class, so you'll need to create\n" +
+                "those codes as well. And don't forget to enter the customer ID\n" +
+                "from the message they send you, otherwise there will be issues\n" +
+                "with linking it all together in the system.");
             Console.WriteLine("\n\nYour first assignment starts right now. Good luck.");
             ResetCursor();
             Console.ReadLine();
@@ -121,24 +122,38 @@ namespace Exercise_2.Services
         /// </summary>
         public static string MainScreen()
         {
-            Console.Clear();
+            while (true)
+            {
+                Console.Clear();
 
-            StatusBar();
+                StatusBar();
 
-            CurrentScreen = Screen.MainScreen;
+                CurrentScreen = Screen.MainScreen;
 
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
 
-            //Show event details, such as age limit, number of attendees, etc
-            Console.WriteLine($"\n\nMinimum age of admission: {EventService.AgeLimit}");
-            Console.WriteLine($"Number of attendees:      {EventService.Attendees.Count}");
+                //Show event details, such as age limit, number of attendees, etc
+                Console.WriteLine($"\n\nMinimum age of admission: {EventService.AgeLimit}");
+                Console.WriteLine($"Number of attendees:      {EventService.Attendees.Count}");
 
-            //Show a list of available commands
-            ListCommands(Screen.MainScreen);
+                //Show a list of available commands
+                ListCommands(CurrentScreen);
 
-            //Wait for player command and return the command if valid, otherwise loop back to the start of the screen
-            ResetCursor();
-            return Console.ReadLine();
+                //Show error message, if any
+                if (_errorMessage != "")
+                {
+                    ErrorMessage(_errorMessage);
+                    _errorMessage = "";
+                }
+
+                //Wait for player command and return the command if valid, otherwise loop back to the start of the screen with an error message
+                ResetCursor();
+                string command = Console.ReadLine();
+                if (IsValidCommand(command, CurrentScreen))
+                    return command;
+                else
+                    _errorMessage = "Command not recognized. Please try again.";
+            }
         }
 
         /// <summary>
@@ -146,34 +161,48 @@ namespace Exercise_2.Services
         /// </summary>
         public static string MessageListScreen()
         {
-            Console.Clear();
-
-            StatusBar();
-
-            CurrentScreen = Screen.MessageListScreen;
-
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-
-            //Show a list of messages (newest first), with unread messages highlighted
-            //Console.WriteLine("\nMessages:\n");
-            Console.WriteLine();
-            Console.WriteLine("#".PadRight(5) + "ID".PadRight(10) + "Subject".PadRight(25) + "Message");
-            int startIndex = GameService.Messages.Count - 1 - _maxMessagesPerScreen * _page;
-            for (int i = startIndex; i >= startIndex - _maxMessagesPerScreen && i >= 0; i--)
+            while (true)
             {
-                Message message = GameService.Messages[i];
-                if (!message.HasBeenRead)
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine($"{GameService.Messages.IndexOf(message).ToString().PadRight(5)}{message.ID.ToString().PadRight(10)}{message.ShortSubject().PadRight(25)}{message.Summary()}");
+                Console.Clear();
+
+                StatusBar();
+
+                CurrentScreen = Screen.MessageListScreen;
+
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
+
+                //Show a list of messages (newest first), with unread messages highlighted
+                //Console.WriteLine("\nMessages:\n");
+                Console.WriteLine();
+                Console.WriteLine("#".PadRight(5) + "ID".PadRight(10) + "Subject".PadRight(25) + "Message");
+                int startIndex = GameService.Messages.Count - 1 - _maxMessagesPerScreen * _page;
+                for (int i = startIndex; i >= startIndex - _maxMessagesPerScreen && i >= 0; i--)
+                {
+                    Message message = GameService.Messages[i];
+                    if (!message.HasBeenRead)
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine($"{GameService.Messages.IndexOf(message).ToString().PadRight(5)}{message.ID.ToString().PadRight(10)}{message.ShortSubject().PadRight(25)}{message.Summary()}");
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
+                }
+
+                //Show a list of available commands
+                ListCommands(CurrentScreen);
+
+                //Show error message, if any
+                if (_errorMessage != "")
+                {
+                    ErrorMessage(_errorMessage);
+                    _errorMessage = "";
+                }
+
+                //Wait for player command and return the command if valid, otherwise loop back to the start of the screen with an error message
+                ResetCursor();
+                string command = Console.ReadLine();
+                if (IsValidCommand(command, CurrentScreen))
+                    return command;
+                else
+                    _errorMessage = "Command not recognized. Please try again.";
             }
-
-            //Show a list of available commands
-            ListCommands(Screen.MessageListScreen);
-
-            //Wait for player command and return the command if valid, otherwise loop back to the start of the screen
-            ResetCursor();
-            return Console.ReadLine();
         }
 
         /// <summary>
@@ -182,44 +211,111 @@ namespace Exercise_2.Services
         /// <param name="m">The message to show</param>
         public static string MessageScreen(Message m)
         {
-            Console.Clear();
+            while (true)
+            {
+                Console.Clear();
 
-            StatusBar();
+                StatusBar();
 
-            CurrentScreen = Screen.MessageScreen;
-            //Show the information contained in the selected message and mark it as read
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine($"\nSubject: {m.Subject}\nCustomer ID: {m.ID}\n\n{m.Contents}");
-            m.Read();
+                CurrentScreen = Screen.MessageScreen;
+                //Show the information contained in the selected message and mark it as read
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine($"\nSubject: {m.Subject}\nCustomer ID: {m.ID}\n\n{m.Contents}");
+                m.Read();
 
-            //Show a list of available commands
-            ListCommands(Screen.MessageScreen);
+                //Show a list of available commands
+                ListCommands(CurrentScreen);
 
-            //Wait for player command and return the command if valid, otherwise loop back to the start of the screen
-            ResetCursor();
-            return Console.ReadLine();
+                //Show error message, if any
+                if (_errorMessage != "")
+                {
+                    ErrorMessage(_errorMessage);
+                    _errorMessage = "";
+                }
+
+                //Wait for player command and return the command if valid, otherwise loop back to the start of the screen with an error message
+                ResetCursor();
+                string command = Console.ReadLine();
+                if (IsValidCommand(command, CurrentScreen))
+                    return command;
+                else
+                    _errorMessage = "Command not recognized. Please try again.";
+            }
         }
 
         /// <summary>
         /// A screen that allows you to send a message to a customer.
         /// </summary>
         /// <param name="id">The id of the customer you want to send a message to</param>
-        public static string SendMessageScreen(int id)
+        public static string SendMessageScreen(ushort id)
         {
-            Console.Clear();
+            Attendee customer = GameService.Customers.Find(a => a.ID == id);
+            if (customer == null)
+            {
+                _errorMessage = "ID not found. Try again.";
+                return "menu";
+            }
 
-            StatusBar();
+            List<string> requests = new List<string>();
 
-            CurrentScreen = Screen.SendMessageScreen;
-            //Show the information in the message to be sent
+            while (true)
+            {
+                Console.Clear();
 
-            //Show a list of available message subjects
+                StatusBar();
 
-            //Show a list of available commands
+                CurrentScreen = Screen.SendMessageScreen;
 
-            //Wait for player command and return the command if valid, otherwise loop back to the start of the screen
-            ResetCursor();
-            return Console.ReadLine();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+
+                //Show the information in the message to be sent
+                Message message = new Message(id, MessageType.UpdateInfo, "Missing/wrong info", $"Hello, {customer.Name}.\n" +
+                    $"Your request to attend the event contains some missing or erroneous information.\n" +
+                    $"Please reply with the following information: {string.Join(", ", requests)}\n\n" +
+                    $"Best regards, {GameService.PlayerName}", requests);
+                Console.WriteLine($"\nTo: {customer.Name} ({customer.ID})");
+                Console.WriteLine($"\nSubject: {message.Subject}");
+                Console.WriteLine($"\n{message.Contents}");
+
+                //Show a list of available commands
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.SetCursorPosition(0, ScreenHeight - 12);
+                Console.WriteLine("\nAvailable Commands:");
+                Console.WriteLine($"{"request [info]".PadRight(ScreenWidth / 3)}Request the specified information.");
+                Console.WriteLine($"{"unrequest [info]".PadRight(ScreenWidth / 3)}Remove the specified information from the request.");
+                Console.WriteLine($"{"send".PadRight(ScreenWidth / 3)}Send the message and return to the menu.");
+                Console.WriteLine($"{"discard".PadRight(ScreenWidth / 3)}Discard the message and return to the menu.");
+
+                //Show error message, if any
+                if (_errorMessage != "")
+                {
+                    ErrorMessage(_errorMessage);
+                    _errorMessage = "";
+                }
+
+                //Wait for player command and return the command if valid, otherwise loop back to the start of the screen with an error message
+                ResetCursor();
+                string command = Console.ReadLine();
+                if (command.StartsWith("request") && command.Split(" ", StringSplitOptions.RemoveEmptyEntries).Length > 1)   //Entered a command to request certain info
+                {
+                    string request = command.Split(" ", StringSplitOptions.RemoveEmptyEntries)[1].ToLower();
+                    requests.Add(request);
+                }
+                else if (command.StartsWith("unrequest") && command.Split(" ", StringSplitOptions.RemoveEmptyEntries).Length > 1)   //Entered a command to unrequest certain info
+                {
+                    string request = command.Split(" ", StringSplitOptions.RemoveEmptyEntries)[1].ToLower();
+                    requests.Remove(request);
+                }
+                else if (command == "send")
+                {
+                    customer.ReceiveMessage(message);
+                    return "menu";
+                }
+                else if (command == "discard")
+                    return "menu";
+                else
+                    _errorMessage = "Command not recognized. Please try again.";
+            }
         }
 
         /// <summary>
@@ -227,18 +323,44 @@ namespace Exercise_2.Services
         /// </summary>
         public static string AttendeeListScreen()
         {
-            Console.Clear();
+            while (true)
+            {
+                Console.Clear();
 
-            StatusBar();
+                StatusBar();
 
-            CurrentScreen = Screen.AttendeeListScreen;
-            //Show a list of attendees with basic details like ID, full name, email adress and discount code
+                CurrentScreen = Screen.AttendeeListScreen;
 
-            //Show a list of available commands
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
 
-            //Wait for player command and return the command if valid, otherwise loop back to the start of the screen
-            ResetCursor();
-            return Console.ReadLine();
+                //Show a list of attendees with basic details like ID, full name, discount code
+                Console.WriteLine();
+                Console.WriteLine("ID".PadRight(10) + "Name".PadRight(20) + "Age".PadRight(5) + "Allergies".PadRight(25) + "Discount Code");
+                int startIndex = EventService.Attendees.Count - 1 - _maxAttendeesPerScreen * _page;
+                for (int i = startIndex; i >= startIndex - _maxAttendeesPerScreen && i >= 0; i--)
+                {
+                    Attendee attendee = EventService.Attendees[i];
+                    Console.WriteLine($"{attendee.ID.ToString().PadRight(10)}{attendee.Name.PadRight(20)}{attendee.Age.ToString().PadRight(5)}{string.Join(", ", attendee.Allergies).PadRight(25)}{attendee.DiscountCode}");
+                }
+
+                //Show a list of available commands
+                ListCommands(CurrentScreen);
+
+                //Show error message, if any
+                if (_errorMessage != "")
+                {
+                    ErrorMessage(_errorMessage);
+                    _errorMessage = "";
+                }
+
+                //Wait for player command and return the command if valid, otherwise loop back to the start of the screen with an error message
+                ResetCursor();
+                string command = Console.ReadLine();
+                if (IsValidCommand(command, CurrentScreen))
+                    return command;
+                else
+                    _errorMessage = "Command not recognized. Please try again.";
+            }
         }
 
         /// <summary>
@@ -246,22 +368,123 @@ namespace Exercise_2.Services
         /// </summary>
         /// <param name="a">The attendee to show information about</param>
         /// <param name="editMode">True if editing an existing attendee, false if adding a new one</param>
-        public static string AttendeeScreen(Attendee a, bool editMode)
+        public static string AttendeeScreen(ushort id, bool editMode)
         {
-            Console.Clear();
+            Attendee attendee = Attendee.Empty();
 
-            StatusBar();
+            if (!editMode)
+            {
+                //return to the menu with an error message if trying to add the same attendee twice
+                if (EventService.Attendees.Find(a => a.ID == id) != null)
+                {
+                    _errorMessage = "Attendee already exists. Try again.";
+                    return "menu";
+                }
+                EventService.AddAttendee(attendee);
+                attendee.SetID(id);
+            }
+            else
+            {
+                attendee = EventService.Attendees.Find(a => a.ID == id);
+                if (attendee == null)
+                {
+                    _errorMessage = "Attendee not found. Try again.";
+                    return "menu";
+                }
+            }
 
-            CurrentScreen = Screen.AttendeeScreen;
-            //Show extended details about the selected attendee
+            while (true)
+            {
+                Console.Clear();
 
-            //Show a list of messages sent by the attendee
+                StatusBar();
 
-            //Show a list of available commands
+                CurrentScreen = Screen.AttendeeScreen;
 
-            //Wait for player command and return the command if valid, otherwise loop back to the start of the screen
-            ResetCursor();
-            return Console.ReadLine();
+                Console.ForegroundColor = ConsoleColor.Green;
+
+                //Show extended details about the selected attendee
+                Console.WriteLine($"\nID: {attendee.ID}");
+                Console.WriteLine($"\nName: {attendee.Name}");
+                Console.WriteLine($"Age: {attendee.Age}");
+                Console.WriteLine($"Ticket: {attendee.Ticket}");
+                Console.WriteLine($"Allergies: {string.Join(", ", attendee.Allergies)}");
+                Console.WriteLine($"Discount: {attendee.DiscountCode}");
+
+                //Show a list of available commands
+                ListCommands(CurrentScreen);
+                Console.WriteLine($"{"set [field] [value]".PadRight(ScreenWidth / 3)}Set the specified field to the specified value");
+                Console.WriteLine($"{"add allergy [allergy]".PadRight(ScreenWidth / 3)}Adds the specified allergy");
+                Console.WriteLine($"{"remove allergy [allergy]".PadRight(ScreenWidth / 3)}Removes the specified allergy");
+
+                //Show error message, if any
+                if (_errorMessage != "")
+                {
+                    ErrorMessage(_errorMessage);
+                    _errorMessage = "";
+                }
+
+                //Wait for player command and return the command if valid, otherwise loop back to the start of the screen with an error message
+                ResetCursor();
+                string command = Console.ReadLine();
+                if(command.StartsWith("set") && command.Split(" ", StringSplitOptions.RemoveEmptyEntries).Length > 2)   //Entered a command to change attendee values
+                {
+                    string field = command.Split(" ", StringSplitOptions.RemoveEmptyEntries)[1].ToLower();
+                    string value = string.Join(" ", command.Split(" ", StringSplitOptions.RemoveEmptyEntries)[2..]);
+                    switch (field)
+                    {
+                        case "name":
+                            attendee.Name = value;
+                            break;
+                        case "age":
+                            attendee.Age = int.Parse(value);
+                            break;
+                        case "ticket":
+                            switch(value.ToLower())
+                            {
+                                case "silver":
+                                    attendee.Ticket = TicketClass.Silver;
+                                    break;
+                                case "gold":
+                                    attendee.Ticket = TicketClass.Gold;
+                                    break;
+                                case "platinum":
+                                    attendee.Ticket = TicketClass.Platinum;
+                                    break;
+                                default:
+                                    _errorMessage = "Command not recognized. Please try again.";
+                                    break;
+                            }
+                            break;
+                        case "discount":
+                            string code = $"EVENT{DateTime.Now.Year.ToString()[2..]}-{value.Replace(" ", "").ToUpper()[..4]}";
+                            if (EventService.Attendees.Find(a => a.DiscountCode == code) == null)
+                                attendee.DiscountCode = code;
+                            else
+                                _errorMessage = "Code already exists. Please try again.";
+                            break;
+                        default:
+                            _errorMessage = "Command not recognized. Please try again.";
+                            break;
+
+
+                    }
+                }
+                else if (command.StartsWith("add allergy") && command.Split(" ", StringSplitOptions.RemoveEmptyEntries).Length > 2)
+                {
+                    string allergy = command.Split(" ", StringSplitOptions.RemoveEmptyEntries)[2];
+                    attendee.Allergies.Add(allergy.ToLower());
+                }
+                else if (command.StartsWith("remove allergy") && command.Split(" ", StringSplitOptions.RemoveEmptyEntries).Length > 2)
+                {
+                    string allergy = command.Split(" ", StringSplitOptions.RemoveEmptyEntries)[2];
+                    attendee.Allergies.Remove(allergy.ToLower());
+                }
+                else if (IsValidCommand(command, CurrentScreen))
+                    return command;
+                else
+                    _errorMessage = "Command not recognized. Please try again.";
+            }
         }
 
         /// <summary>
@@ -344,6 +567,15 @@ namespace Exercise_2.Services
             return GameService.ValidCommands.Where(c => c.ValidIn.Contains(screen)).ToList();
         }
 
+        private static bool IsValidCommand(string command, Screen screen)
+        {
+            List<Command> validCommands = GetValidCommands(screen);
+            foreach (Command command2 in validCommands)
+                if (command2.Match(command))
+                    return true;
+            return false;
+        }
+
         /// <summary>
         /// Resets the console cursor to the default input location.
         /// </summary>
@@ -388,10 +620,11 @@ namespace Exercise_2.Services
         }
 
         /// <summary>
-        /// Redraws the current screen.
+        /// Redraws the current screen, optionally with an error message
         /// </summary>
-        internal static string Redraw()
+        internal static string Redraw(string error = "")
         {
+            _errorMessage = error;
             switch(CurrentScreen)
             {
                 case Screen.MessageListScreen:

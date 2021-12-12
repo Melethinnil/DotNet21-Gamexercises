@@ -24,10 +24,10 @@ namespace Exercise_2.Services
         {
                 new Command("messages", "Show a list of received messages", Enum.GetValues(typeof(Screen)).Cast<Screen>().Where(screen => screen != Screen.MessageListScreen).ToList()),
                 new Command("attendees", "Show a list of all current attendees", Enum.GetValues(typeof(Screen)).Cast<Screen>().Where(screen => screen != Screen.AttendeeListScreen).ToList()),
-                new Command("read message", "Read the message with the specified number", "[number]"),
-                new Command("send message", "Send a message to the specified customer ID", "[id]"),
-                new Command("view attendee", "View attendee details for the specified customer ID", "[id]"),
-                new Command("add attendee", "Add an attendee with the specified ID to the event", "[id]"),
+                new Command("read message", "Read the message with the specified number", "[number]", new List<Screen>(){Screen.MessageListScreen}),
+                new Command("send message", "Send a message to the specified customer ID", "[id]", Enum.GetValues(typeof(Screen)).Cast<Screen>().Where(screen => screen != Screen.SendMessageScreen).ToList()),
+                new Command("view attendee", "View attendee details for the specified customer ID", "[id]", Enum.GetValues(typeof(Screen)).Cast<Screen>().Where(screen => screen != Screen.AttendeeScreen).ToList()),
+                new Command("add attendee", "Add an attendee with the specified ID to the event", "[id]", Enum.GetValues(typeof(Screen)).Cast<Screen>().Where(screen => screen != Screen.AttendeeScreen).ToList()),
                 new Command("next", "Go to the next page of the current screen", new List<Screen>(){Screen.MessageListScreen, Screen.AttendeeListScreen}),
                 new Command("prev", "Go to the previous page of the current screen", new List<Screen>(){Screen.MessageListScreen, Screen.AttendeeListScreen}),
                 new Command("menu", "return to the main menu", Enum.GetValues(typeof(Screen)).Cast<Screen>().Where(screen => screen != Screen.MainScreen).ToList())
@@ -53,7 +53,7 @@ namespace Exercise_2.Services
 
         private static void GenerateCustomers()
         {
-            for (int i = 0; i < 150; i++)
+            for (int i = 0; i < 100; i++)
             {
                 Customers.Add(new Attendee());
             }
@@ -85,36 +85,65 @@ namespace Exercise_2.Services
             while (TimeRemaining() > 0)
             {
                 command = command.ToLower();
-                if (command == "messages")
+                if (ValidCommands[0].Match(command))    //messages
                 {
                     UIService.FirstPage();
                     command = UIService.MessageListScreen();
                 }
-                else if (command == "attendees")
+                else if (ValidCommands[1].Match(command))   //attendees
                 {
                     UIService.FirstPage();
                     command = UIService.AttendeeListScreen();
                 }
-                else if (command == "menu")
+                else if (ValidCommands[2].Match(command))    //read message
                 {
-                    command = UIService.MainScreen();
+                    int index = int.Parse(command.Split(' ', StringSplitOptions.RemoveEmptyEntries)[2]);
+                    if (index >= Messages.Count)
+                        command = UIService.Redraw("That message doesn't exist. Try again.");
+                    else
+                        command = UIService.MessageScreen(Messages[index]);
                 }
-                else if (command == "next")
+                else if (ValidCommands[3].Match(command))    //send message
+                {
+                    ushort id = ushort.Parse(command.Split(' ', StringSplitOptions.RemoveEmptyEntries)[2]);
+                    if (id < 12345 || id > 59999)
+                        command = UIService.Redraw("Invalid ID. Try again.");
+                    else
+                        command = UIService.SendMessageScreen(id);
+                }
+                else if (ValidCommands[4].Match(command))    //view attendee
+                {
+                    ushort id = ushort.Parse(command.Split(' ', StringSplitOptions.RemoveEmptyEntries)[2]);
+                    if (id < 12345 || id > 59999)
+                        command = UIService.Redraw("Invalid ID. Try again.");
+                    else
+                        command = UIService.AttendeeScreen(id, true);
+                }
+                else if (ValidCommands[5].Match(command))    //add attendee
+                {
+                    ushort id = ushort.Parse(command.Split(' ', StringSplitOptions.RemoveEmptyEntries)[2]);
+                    if (id < 12345 || id > 59999)
+                        command = UIService.Redraw("Invalid ID. Try again.");
+                    else
+                        command = UIService.AttendeeScreen(id, false);
+                }
+                else if (ValidCommands[6].Match(command))   //next
                 {
                     UIService.NextPage();
                     command = UIService.Redraw();
                 }
-                else if (command == "prev")
+                else if (ValidCommands[7].Match(command))   //previous
                 {
                     UIService.PrevPage();
                     command = UIService.Redraw();
                 }
-                else if(command.StartsWith("read message"))
+                else if (ValidCommands[8].Match(command))   //menu
                 {
-                    int index = int.Parse(command.Substring(13).Trim());
-                    command = UIService.MessageScreen(Messages[index]);
+                    command = UIService.MainScreen();
                 }
             }
+
+            UIService.EndScreen();
         }
 
         /// <summary>

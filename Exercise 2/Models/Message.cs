@@ -6,9 +6,8 @@ namespace Exercise_2.Models
     {
         Booking,
         Unbooking,
-        WrongInfo,
         ChangeTicket,
-        MissingInfo
+        UpdateInfo
     }
 
     internal class Message
@@ -18,6 +17,7 @@ namespace Exercise_2.Models
         public string Subject { get; set; }
         public string Contents { get; set; }
         public bool HasBeenRead { get; private set; } = false;
+        public List<string> requestedInfo { get; set; }
 
         public Message(ushort id, MessageType type, string subject, string contents)
         {
@@ -25,6 +25,15 @@ namespace Exercise_2.Models
             Type = type;
             Subject = subject;
             Contents = contents;
+            requestedInfo = new List<string>();
+        }
+        public Message(ushort id, MessageType type, string subject, string contents, List<string> requests)
+        {
+            ID = id;
+            Type = type;
+            Subject = subject;
+            Contents = contents;
+            requestedInfo = requests;
         }
 
         /// <summary>

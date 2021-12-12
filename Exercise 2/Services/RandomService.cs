@@ -227,7 +227,7 @@ namespace Exercise_2.Services
             "workplace.org",
             "university.edu"
         };
-        private static List<string> _specialNotesPrefixes = new()
+        private static List<string> _allergyPrefixes = new()
         {
             "I am allergic to",
             "I don't want",
@@ -235,7 +235,7 @@ namespace Exercise_2.Services
             "I can't stand",
             "I get sick from"
         };
-        private static List<string> _specialNotesSubjects = new()
+        private static List<string> _allergies = new()
         {
             "peanuts",
             "olives",
@@ -277,30 +277,43 @@ namespace Exercise_2.Services
             return id;
         }
 
-        internal static string SpecialNotes()
+        internal static List<string> Allergies()
         {
             bool generateNotes = random.Next(100) >= 50;
             if (generateNotes)
             {
-                string notes = _specialNotesPrefixes[random.Next(_specialNotesPrefixes.Count)] + " ";
+                List<string> notes = new List<string>();
                 int numNotes = random.Next(1, 4);
-                List<string> subjects = new List<string>(_specialNotesSubjects);
-                for(int i = 0; i < numNotes; i++)
+                List<string> subjects = new List<string>(_allergies);
+                for (int i = 0; i < numNotes; i++)
                 {
                     int index = random.Next(0, subjects.Count);
-                    notes += subjects[index];
+                    notes.Add(subjects[index]);
                     subjects.RemoveAt(index);
-                    if (i < numNotes - 2)
-                        notes += ", ";
-                    else if (i < numNotes - 1)
-                        notes += " and ";
-                    else
-                        notes += ".";
                 }
                 return notes;
             }
             else
-                return "";
+                return new List<string>();
+        }
+
+        internal static string AllergyText(List<string> allergies)
+        {
+            if (allergies.Count == 0)
+                return "I am not allergic to anything.";
+
+            string allergyText = _allergyPrefixes[random.Next(_allergyPrefixes.Count)] + " ";
+            for(int i = 0; i < allergies.Count; i++)
+            {
+                allergyText += allergies[i];
+                if (i < allergies.Count - 2)
+                    allergyText += ", ";
+                else if (i < allergies.Count - 1)
+                    allergyText += " and ";
+                else
+                    allergyText += ".";
+            }
+            return allergyText;
         }
 
         internal static TicketClass Ticket()
@@ -349,7 +362,7 @@ namespace Exercise_2.Services
 
         internal static MessageType RandomMessageType()
         {
-            Array types = Enum.GetValues(typeof(MessageType));
+            MessageType[] types = { MessageType.Unbooking, MessageType.ChangeTicket, MessageType.UpdateInfo };
             return (MessageType)types.GetValue(random.Next(types.Length));
         }
 
@@ -361,9 +374,7 @@ namespace Exercise_2.Services
                     return _subjectsReservation[random.Next(_subjectsReservation.Count)];
                 case MessageType.Unbooking:
                     return "";
-                case MessageType.MissingInfo:
-                    return "";
-                case MessageType.WrongInfo:
+                case MessageType.UpdateInfo:
                     return "";
                 case MessageType.ChangeTicket:
                     return "";

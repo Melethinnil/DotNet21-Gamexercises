@@ -20,5 +20,14 @@ namespace Exercise_2.Services
     {
         public static int AgeLimit { get; private set; } = RandomService.random.Next(8, 21);
         public static List<Attendee> Attendees { get; private set; } = new List<Attendee>();
+
+        public static void AddAttendee(Attendee a)
+        {
+            Attendees.Add(a);
+        }
+        public static void RemoveAttendee(int id)
+        {
+            Attendees = Attendees.Where(a => a.ID != id).ToList();
+        }
     }
 }

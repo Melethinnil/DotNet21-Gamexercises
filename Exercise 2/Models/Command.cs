@@ -51,5 +51,17 @@ namespace Exercise_2.Models
         {
             return Value + " " + ExtraValue;
         }
+
+        public bool Match(string command)
+        {
+            if(ExtraValue == "")
+            {
+                return command == Value;
+            }
+            else
+            {
+                return command.StartsWith(Value);
+            }
+        }
     }
 }
