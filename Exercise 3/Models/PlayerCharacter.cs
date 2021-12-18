@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace WarehouseWorker
 {
-    internal class PlayerCharacter : IControllable, IDrawable
+    internal class PlayerCharacter : IControllable, IDrawable, IEntity
     {
         public string Name { get; }
         public char Symbol { get; }
         public ICarryable? HeldItem { get; private set; } = null;
 
-        public ScreenPosition Position { get; private set; }
+        public ScreenSpace Position { get; private set; }
         public ConsoleColor Color { get; set; }
 
         public PlayerCharacter(string name, char symbol, ConsoleColor color)
@@ -30,7 +30,7 @@ namespace WarehouseWorker
         public void Move(Direction direction)
         {
             UnDraw();
-            ScreenPosition pos = Position;
+            ScreenSpace pos = Position;
             switch(direction)
             {
                 case Direction.Left:
@@ -46,6 +46,14 @@ namespace WarehouseWorker
                     pos.Y++;
                     break;
             }
+            Position = pos;
+        }
+        public void MoveTo(int x, int y)
+        {
+            UnDraw();
+            ScreenSpace pos = Position;
+            pos.X = x;
+            pos.Y = y;
             Position = pos;
         }
 

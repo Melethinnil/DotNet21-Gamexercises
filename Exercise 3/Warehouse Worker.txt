@@ -10,6 +10,9 @@ The goal is to have as many items of as many different kinds as possible in stor
 You order items by going to your computer and inputting the required information: ID, product name, category, description and price
 	No field can be empty, category must be chosen from a predefined list, and ID must be unique
 		If you enter an existing ID, you instead automatically order another of that item
+	each unique item (id) also gets a random symbol/colour combination that isn't used anywhere else
+	After ordering them, items come in slowly on a conveyor belt at the side
+		The conveyor belt can only hold a certain number of items at the same time, so that you can't just order everything at once and then store it afterwards
 
 A list on the side of the screen shows a summary line for each unique item in storage at all times
 	ID, name, amount in storage and a shortened version of the description
@@ -23,3 +26,5 @@ When you exit the storage floor, the product list is saved to a csv file in the 
 	at the start of the game, all valid files in that folder are read and stored in a high score list that can be seen on the main menu
 
 At the start of the game, you choose your "character" from a set of symbols of different colors
+
+Multiply everything on the X dimension by 2, to make the visual spacing more even

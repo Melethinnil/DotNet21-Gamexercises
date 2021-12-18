@@ -1,8 +1,7 @@
 ﻿namespace WarehouseWorker
 {
-    internal interface IDrawable
+    internal interface IScreen
     {
         public void Draw();
-        public void UnDraw();
     }
 }

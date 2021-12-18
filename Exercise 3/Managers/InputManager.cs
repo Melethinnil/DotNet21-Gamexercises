@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace WarehouseWorker
 {
-    internal class InputHelper
+    internal class InputManager
     {
         private IControllable _player;
-        public InputHelper(IControllable player)
+        public InputManager(IControllable player)
         {
             _player = player;
+            _player.MoveTo(16, 10);
         }
         public void ReadKeyInput(ConsoleKey key)
         {
