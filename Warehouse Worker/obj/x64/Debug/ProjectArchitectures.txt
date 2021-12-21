@@ -1,0 +1,1 @@
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\Warehouse Worker.csproj;x64

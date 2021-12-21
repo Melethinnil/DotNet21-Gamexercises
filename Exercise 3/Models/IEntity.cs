@@ -1,10 +1,9 @@
-﻿namespace WarehouseWorker
+﻿namespace WarehouseWorker.Models
 {
     internal interface IEntity
     {
-        public char Symbol { get; }
-
-        public ScreenSpace Position { get; }
-        public ConsoleColor Color { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+        public void MoveTo(int x, int y);
     }
 }

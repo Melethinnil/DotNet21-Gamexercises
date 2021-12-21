@@ -1,14 +1,23 @@
-﻿using WarehouseWorker;
+﻿using System.Runtime.InteropServices;
+using WarehouseWorker.Managers;
+using WarehouseWorker.Models;
 
-PlayerCharacter player = new PlayerCharacter("Amanda", 'A', ConsoleColor.Green);
-InputManager playerController = new InputManager(player);
-EntityManager entityManager = new EntityManager(player);
-DisplayManager displayManager = new DisplayManager(entityManager);
+[DllImport("kernel32.dll", SetLastError = true)]
+static extern bool SetConsoleOutputCP(uint wCodePageID);
+
+[DllImport("kernel32.dll", SetLastError = true)]
+static extern bool SetConsoleCP(uint wCodePageID);
+
+SetConsoleOutputCP(65001);
+SetConsoleCP(65001);
+
 Console.CursorVisible = false;
+
+ScreenManager sm = new ScreenManager(new MainGameScreen());
+IInputManager im = new InputManager(sm);
 
 while(true)
 {
-    //Console.Clear();
-    displayManager.Draw();
-    playerController.ReadKeyInput(Console.ReadKey(true).Key);
+    sm.Draw();
+    im.ReadInput();
 }

@@ -3,9 +3,14 @@
   "ProjectMap": {
     "34d48daf-a2b3-4101-87c1-ba8f704c44bc": {
       "ProjectGuid": "34d48daf-a2b3-4101-87c1-ba8f704c44bc",
-      "DisplayName": "Exercise 3",
+      "DisplayName": "Exercise 3_Console",
       "ColorIndex": 0
+    },
+    "ed47f3b4-7148-463a-b296-7ca59581d798": {
+      "ProjectGuid": "ed47f3b4-7148-463a-b296-7ca59581d798",
+      "DisplayName": "Warehouse Worker",
+      "ColorIndex": 1
     }
   },
-  "NextColorIndex": 1
+  "NextColorIndex": 2
 }

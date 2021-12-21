@@ -3,33 +3,58 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WarehouseWorker.Models;
 
-namespace WarehouseWorker
+namespace WarehouseWorker.Managers
 {
-    internal class InputManager
+    /// <summary>
+    /// Handles all keyboard input.
+    /// </summary>
+    internal interface IInputManager
     {
-        private IControllable _player;
-        public InputManager(IControllable player)
+        public void ReadInput();
+    }
+
+    internal class InputManager : IInputManager
+    {
+        private IScreenManager _screenManager;
+
+        public InputManager(IScreenManager screenManager)
         {
-            _player = player;
-            _player.MoveTo(16, 10);
+            _screenManager = screenManager;
         }
-        public void ReadKeyInput(ConsoleKey key)
+
+        public void ReadInput()
         {
-            switch(key)
+            IScreen screen = _screenManager.CurrentScreen;
+
+
+            if (screen is MainGameScreen)
             {
-                case ConsoleKey.UpArrow:
-                    _player.Move(Direction.Up);
-                    break;
-                case ConsoleKey.RightArrow:
-                    _player.Move(Direction.Right);
-                    break;
-                case ConsoleKey.DownArrow:
-                    _player.Move(Direction.Down);
-                    break;
-                case ConsoleKey.LeftArrow:
-                    _player.Move(Direction.Left);
-                    break;
+                MainGameScreen scr = (MainGameScreen)screen;
+                IEntityManager em = scr.EntityManager;
+                ConsoleKey key = Console.ReadKey(true).Key;
+                int x = 0;
+                int y = 0;
+                switch (key)
+                {
+                    case ConsoleKey.UpArrow:
+                        y = -1;
+                        em.MovePlayer(x, y, scr.RoomSize, scr.RoomSize);
+                        break;
+                    case ConsoleKey.DownArrow:
+                        y = 1;
+                        em.MovePlayer(x, y, scr.RoomSize, scr.RoomSize-1);
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        x = -1;
+                        em.MovePlayer(x, y, scr.RoomSize, scr.RoomSize);
+                        break;
+                    case ConsoleKey.RightArrow:
+                        x = 1;
+                        em.MovePlayer(x, y, scr.RoomSize, scr.RoomSize);
+                        break;
+                } 
             }
         }
     }

@@ -1,0 +1,28 @@
+You're a lone warehouse worker who is responsible for ordering and sorting inventory items
+
+The view is the storage area from above (roguelike style), you run around to and from your computer where you order items, the conveyor belt where incoming items appear, the storage floor where you place items, and an incinerator where you can remove unwanted items
+
+Items in storage are only allowed to be adjacent to other items of the same kind (with the same ID)
+
+The goal is to have as many items of as many different kinds as possible in storage, and to do it in as short time as possible
+	you decide when to be finished, by leaving the room through the exit door (which obviously needs to be unblocked to do that)
+
+You order items by going to your computer and inputting the required information: ID, product name, category, description and price
+	No field can be empty, category must be chosen from a predefined list, and ID must be unique
+		If you enter an existing ID, you instead automatically order another of that item
+	each unique item (id) also gets a random symbol/colour combination that isn't used anywhere else
+	After ordering them, items come in slowly on a conveyor belt at the side
+		The conveyor belt can only hold a certain number of items at the same time, so that you can't just order everything at once and then store it afterwards
+
+A list on the side of the screen shows a summary line for each unique item in storage at all times
+	ID, name, amount in storage and a shortened version of the description
+		items are only counted as actually being in storage while they are on the floor (when you pick them up they are removed from storage until you put them down again)
+
+When you stand next to an item and face it (i.e. you are in position to pick it up), the complete information about that item is displayed
+
+You can throw items in the incinerator to destroy them if you want to make space on the storage floor
+
+When you exit the storage floor, the product list is saved to a csv file in the appdata folder
+	at the start of the game, all valid files in that folder are read and stored in a high score list that can be seen on the main menu
+
+At the start of the game, you choose your "character" from a set of symbols of different colors

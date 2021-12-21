@@ -14,9 +14,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "S:\\OneDrive\\IT-utbildning\\Repository 2\\Exercise 3\\Exercise 3.csproj",
-      "projectName": "Exercise 3",
-      "projectPath": "S:\\OneDrive\\IT-utbildning\\Repository 2\\Exercise 3\\Exercise 3.csproj",
+      "projectUniqueName": "S:\\OneDrive\\IT-utbildning\\Repository 2\\Exercise 3\\Exercise 3_Console.csproj",
+      "projectName": "Exercise 3_Console",
+      "projectPath": "S:\\OneDrive\\IT-utbildning\\Repository 2\\Exercise 3\\Exercise 3_Console.csproj",
       "packagesPath": "C:\\Users\\amand\\.nuget\\packages\\",
       "outputPath": "S:\\OneDrive\\IT-utbildning\\Repository 2\\Exercise 3\\obj\\",
       "projectStyle": "PackageReference",

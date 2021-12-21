@@ -1,0 +1,45 @@
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\bin\x64\Debug\App.xbf
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\bin\x64\Debug\MainPage.xbf
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\bin\x64\Debug\Warehouse Worker.xr.xml
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\bin\x64\Debug\Warehouse Worker.exe
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\bin\x64\Debug\Warehouse Worker.pdb
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\bin\x64\Debug\resources.pri
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\bin\x64\Debug\AppxManifest.xml
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\bin\x64\Debug\Core\AppxManifest.xml
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\bin\x64\Debug\Core\Warehouse Worker.exe
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\bin\x64\Debug\Warehouse Worker.build.appxrecipe
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\bin\x64\Debug\System.Runtime.dll
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\bin\x64\Debug\Microsoft.UI.Xaml.Markup.winmd
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\Warehouse Worker.csproj.AssemblyReference.cache
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\App.g.i.cs
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\App.g.cs
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\MainPage.g.i.cs
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\MainPage.g.cs
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\XamlTypeInfo.g.cs
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\App.xaml
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\MainPage.xaml
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\App.xbf
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\MainPage.xbf
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\XamlSaveStateFile.xml
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\Warehouse Worker.csproj.CoreCompileInputs.cache
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\Warehouse Worker.csproj.CopyComplete
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\Warehouse Worker.exe
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\Warehouse Worker.pdb
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\ResourceHandlingTask.state
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\priconfig.xml
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\priconfig.xml.intermediate
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\unfiltered.layout.resfiles
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\unfiltered.layout.resfiles.intermediate
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\filtered.layout.resfiles
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\filtered.layout.resfiles.intermediate
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\excluded.layout.resfiles
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\excluded.layout.resfiles.intermediate
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\resources.resfiles
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\resources.resfiles.intermediate
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\pri.resfiles
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\pri.resfiles.intermediate
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\qualifiers.txt
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\qualifiers.txt.intermediate
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\MultipleQualifiersPerDimensionFound.txt
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\ProjectArchitectures.txt
+S:\OneDrive\IT-utbildning\Repository 2\Warehouse Worker\obj\x64\Debug\.winmd_cache\$Microsoft.UI.Xaml.Markup.winmd_637424779200000000.json
