@@ -21,8 +21,8 @@ namespace WarehouseWorker.Models
         public MainGameScreen()
         {
             EntityManager = new EntityManager(this);
-            Console.SetWindowSize(50, 25);
-            Console.SetBufferSize(50, 25);
+            Console.SetWindowSize(50, 50);
+            Console.SetBufferSize(50, 50);
             CreateWalls();
         }
 
@@ -31,24 +31,42 @@ namespace WarehouseWorker.Models
             //Symbols list: https://en.wikipedia.org/wiki/List_of_Unicode_characters#Block_Elements
 
             //Horizontal walls
-            _toRedraw.Add(new Wall("╔".PadRight(RoomSize * XMultiplier + 2, '═') + "╗", 0, 0, this, true));
-            _toRedraw.Add(new Wall("╚".PadRight(RoomSize * XMultiplier + 2, '═') + "╝", 0, RoomSize + 1, this, true));
+            for(int i = 1; i < RoomSize + 2; i++)
+            {
+                EntityManager.AddEntity(new Wall('═', i, 0, this));
+                EntityManager.AddEntity(new Wall('═', i, RoomSize+2, this));
+            }
 
             //Vertical walls
-            _toRedraw.Add(new Wall("╔".PadRight(RoomSize + 1, '║') + "╚", 0, 0, this));
-            _toRedraw.Add(new Wall("╗".PadRight(RoomSize + 1, '║') + "╝", RoomSize * XMultiplier + 2, 0, this));
+            for (int i = 1; i < RoomSize + 2; i++)
+            {
+                EntityManager.AddEntity(new Wall('║', 0, i, this));
+                EntityManager.AddEntity(new Wall('║', RoomSize + 2, i, this));
+            }
+
+            //Corners
+            EntityManager.AddEntity(new Wall('╔', 0, 0, this));
+            EntityManager.AddEntity(new Wall('╗', RoomSize + 2, 0, this));
+            EntityManager.AddEntity(new Wall('╚', 0, RoomSize + 2, this));
+            EntityManager.AddEntity(new Wall('╝', RoomSize + 2, RoomSize + 2, this));
         }
 
         public void Draw()
         {
             foreach (IDrawable drawable in _toRedraw)
-                drawable.Draw(1, 1);
+                drawable.Draw();
 
             _toRedraw.Clear();
         }
         public void MarkForRedraw(IDrawable drawable)
         {
             _toRedraw.Add(drawable);
+        }
+
+        public (int X, int Y) GetCursorTarget()
+        {
+            IPlayerCharacter player = EntityManager.GetPlayer();
+            return (player.TargetX, player.TargetY);
         }
     }
 }

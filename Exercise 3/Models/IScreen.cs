@@ -6,5 +6,6 @@
 
         void Draw();
         void MarkForRedraw(IDrawable drawable);
+        (int X, int Y) GetCursorTarget();
     }
 }

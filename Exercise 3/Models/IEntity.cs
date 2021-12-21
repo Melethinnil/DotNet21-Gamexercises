@@ -1,6 +1,6 @@
 ﻿namespace WarehouseWorker.Models
 {
-    internal interface IEntity
+    internal interface IEntity : IDrawable
     {
         public int X { get; set; }
         public int Y { get; set; }

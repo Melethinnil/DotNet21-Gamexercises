@@ -26,3 +26,5 @@ When you exit the storage floor, the product list is saved to a csv file in the 
 	at the start of the game, all valid files in that folder are read and stored in a high score list that can be seen on the main menu
 
 At the start of the game, you choose your "character" from a set of symbols of different colors
+
+Add a note in the intro screen to set the console font to Raster 8x8

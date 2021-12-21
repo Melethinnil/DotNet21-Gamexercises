@@ -11,7 +11,7 @@ static extern bool SetConsoleCP(uint wCodePageID);
 SetConsoleOutputCP(65001);
 SetConsoleCP(65001);
 
-Console.CursorVisible = false;
+//Console.CursorVisible = false;
 
 ScreenManager sm = new ScreenManager(new MainGameScreen());
 IInputManager im = new InputManager(sm);

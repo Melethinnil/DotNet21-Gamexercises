@@ -8,44 +8,26 @@ namespace WarehouseWorker.Models
 {
     internal class Wall : IDrawable, IEntity
     {
-        private int _xOffset;
-        private int _yOffset;
-        public bool IsHorizontal { get; private set; }
-        public string Symbol { get; private set; }
+        public char Symbol { get; private set; }
         public ConsoleColor Color { get; private set; } = ConsoleColor.DarkGray;
         public int X { get; set; }
         public int Y { get; set; }
 
         public IScreen ContainerScreen { get; private set; }
 
-        public Wall(string symbol, int x, int y, IScreen container, bool horizontal = false)
+        public Wall(char symbol, int x, int y, IScreen container)
         { 
             Symbol = symbol;
             X = x;
             Y = y;
-            IsHorizontal = horizontal;
             ContainerScreen = container;
         }
 
-        public void Draw(int xOffset, int yOffset)
+        public void Draw()
         {
-            _xOffset = xOffset;
-            _yOffset = yOffset;
+            Console.SetCursorPosition(X, Y);
             Console.ForegroundColor = Color;
-            if (IsHorizontal)
-            {
-                Console.SetCursorPosition(X, Y);
-                Console.Write(Symbol); 
-            }
-            else
-            {
-                for(int i = 0; i < Symbol.Length; i++)
-                {
-                    Console.SetCursorPosition(X, Y + i);
-                    Console.Write(Symbol[i]);
-                }
-            }
-
+            Console.Write(Symbol);
         }
 
         public void Undraw()

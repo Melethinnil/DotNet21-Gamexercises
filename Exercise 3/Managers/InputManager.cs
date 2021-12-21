@@ -40,19 +40,22 @@ namespace WarehouseWorker.Managers
                 {
                     case ConsoleKey.UpArrow:
                         y = -1;
-                        em.MovePlayer(x, y, scr.RoomSize, scr.RoomSize);
+                        em.MovePlayer(x, y, scr.RoomSize + 1, scr.RoomSize + 1, 1, 1);
                         break;
                     case ConsoleKey.DownArrow:
                         y = 1;
-                        em.MovePlayer(x, y, scr.RoomSize, scr.RoomSize-1);
+                        em.MovePlayer(x, y, scr.RoomSize + 1, scr.RoomSize + 1, 1, 1);
                         break;
                     case ConsoleKey.LeftArrow:
                         x = -1;
-                        em.MovePlayer(x, y, scr.RoomSize, scr.RoomSize);
+                        em.MovePlayer(x, y, scr.RoomSize + 1, scr.RoomSize + 1, 1, 1);
                         break;
                     case ConsoleKey.RightArrow:
                         x = 1;
-                        em.MovePlayer(x, y, scr.RoomSize, scr.RoomSize);
+                        em.MovePlayer(x, y, scr.RoomSize + 1, scr.RoomSize + 1, 1, 1);
+                        break;
+                    case ConsoleKey.Spacebar:
+                        em.PickUpOrPutDownAt(Console.CursorLeft, Console.CursorTop);
                         break;
                 } 
             }

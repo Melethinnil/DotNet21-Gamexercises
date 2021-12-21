@@ -5,11 +5,11 @@
     /// </summary>
     internal interface IDrawable
     {
-        string Symbol { get; }
+        char Symbol { get; }
         ConsoleColor Color { get; }
         IScreen ContainerScreen { get; }
 
-        void Draw(int xOffset, int yOffset);
+        void Draw();
         void Undraw();
     }
 }

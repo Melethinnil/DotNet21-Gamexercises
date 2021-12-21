@@ -10,26 +10,35 @@ namespace WarehouseWorker.Models
     /// <summary>
     /// A character that the player can control.
     /// </summary>
-    internal interface IPlayerCharacter : IDrawable, IEntity
+    internal interface IPlayerCharacter : IEntity
     {
         public string Name { get; }
+        public int TargetX { get; set; }
+        public int TargetY { get; set; }
+        public ICarryable? HeldItem { get; set; }
+
+        void SetDirection(string direction);
+        void PickUpItem(ICarryable item);
+        ICarryable? PutDownItem(int x, int y);
     }
 
     internal class PlayerCharacter : IPlayerCharacter
     {
-        private int _xOffset;
-        private int _yOffset;
         public IScreen ContainerScreen { get; private set; }
         public int X { get; set; }
         public int Y { get; set; }
+        public int TargetX { get; set; }
+        public int TargetY { get; set; }
 
         public string Name { get; private set; }
 
-        public string Symbol { get; private set; }
+        public char Symbol { get; private set; }
 
         public ConsoleColor Color { get; private set; }
 
-        public PlayerCharacter(string name, string symbol, ConsoleColor color, IScreen container)
+        public ICarryable? HeldItem { get; set; }
+
+        public PlayerCharacter(string name, char symbol, ConsoleColor color, IScreen container)
         {
             Name = name;
             Symbol = symbol;
@@ -37,11 +46,9 @@ namespace WarehouseWorker.Models
             ContainerScreen = container;
         }
 
-        public void Draw(int xOffset, int yOffset)
+        public void Draw()
         {
-            _xOffset = xOffset;
-            _yOffset = yOffset;
-            Console.SetCursorPosition(X * ContainerScreen.XMultiplier + _xOffset, Y + _yOffset);
+            Console.SetCursorPosition(X, Y);
             Console.ForegroundColor = Color;
             Console.Write(Symbol);
         }
@@ -51,13 +58,51 @@ namespace WarehouseWorker.Models
             Undraw();
             X = x;
             Y = y;
+            ContainerScreen.MarkForRedraw(this);
         }
 
         public void Undraw()
         {
-            Console.SetCursorPosition(X * ContainerScreen.XMultiplier + _xOffset, Y + _yOffset);
+            Console.SetCursorPosition(X, Y);
             Console.Write(' ');
-            ContainerScreen.MarkForRedraw(this);
+        }
+
+        public void SetDirection(string direction)
+        {
+            switch(direction)
+            {
+                case "left":
+                    TargetX = X - 1;
+                    TargetY = Y;
+                    break;
+                case "right":
+                    TargetX = X + 1;
+                    TargetY = Y;
+                    break;
+                case "up":
+                    TargetX = X;
+                    TargetY = Y - 1;
+                    break;
+                case "down":
+                    TargetX = X;
+                    TargetY = Y + 1;
+                    break;
+            }
+        }
+
+        public void PickUpItem(ICarryable item)
+        {
+            HeldItem = item;
+            HeldItem.Undraw();
+        }
+
+        public ICarryable? PutDownItem(int x, int y)
+        {
+            ICarryable? item = HeldItem;
+            if (item != null)
+                item.MoveTo(x, y);
+            HeldItem = null;
+            return item;
         }
     }
 }

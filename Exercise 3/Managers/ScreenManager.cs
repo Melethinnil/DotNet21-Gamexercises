@@ -24,10 +24,13 @@ namespace WarehouseWorker.Managers
         public ScreenManager(IScreen screen)
         {
             CurrentScreen = screen;
+            Console.CursorSize = 100;
         }
         public void Draw()
         {
             CurrentScreen.Draw();
+            (int X, int Y) cursorTarget = CurrentScreen.GetCursorTarget();
+            Console.SetCursorPosition(cursorTarget.X, cursorTarget.Y);
         }
         public void ChangeScreen(IScreen screen)
         {
