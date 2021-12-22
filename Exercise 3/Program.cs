@@ -13,11 +13,9 @@ SetConsoleCP(65001);
 
 //Console.CursorVisible = false;
 
-ScreenManager sm = new ScreenManager(new MainGameScreen());
-IInputManager im = new InputManager(sm);
+ScreenManager sm = new ScreenManager(new MainGameScreen(16, 12));
 
 while(true)
 {
     sm.Draw();
-    im.ReadInput();
 }

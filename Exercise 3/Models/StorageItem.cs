@@ -48,6 +48,19 @@ namespace WarehouseWorker.Models
             X = x;
             Y = y;
         }
+        public StorageItem(IScreen screen)
+        {
+            ID = 0;
+            Name = String.Empty;
+            Category = String.Empty;
+            Description = String.Empty;
+            Price = 0;
+            Symbol = ' ';
+            Color = ConsoleColor.White;
+            ContainerScreen= screen;
+            X = 0;
+            Y = 0;
+        }
 
         public void Draw()
         {

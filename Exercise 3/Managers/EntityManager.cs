@@ -15,7 +15,8 @@ namespace WarehouseWorker.Managers
         void MovePlayer(int x, int y, int maxX, int maxY, int minX, int minY);
         void AddEntity(IEntity entity);
         IPlayerCharacter GetPlayer();
-        void PickUpOrPutDownAt(int x, int y);
+        void InteractAt(int x, int y);
+        void AddPlayer(IPlayerCharacter playerCharacter, int x, int y, string direction);
     }
 
     internal class EntityManager : IEntityManager
@@ -27,10 +28,14 @@ namespace WarehouseWorker.Managers
         public EntityManager(IScreen container)
         {
             _container = container;
-            _player = new PlayerCharacter("Amanda", 'A', ConsoleColor.Green, _container);
-            _player.MoveTo(10, 10);
-            _player.SetDirection("down");
-            AddEntity(new StorageItem(1, "TestItem", "TestCategory", "TestDescription", 10, '#', ConsoleColor.Blue, _container, 5, 5));
+            AddTestEntities();
+        }
+
+        private void AddTestEntities()
+        {
+            AddEntity(new StorageItem(1, "TestItem", "TestCategory", "TestDescription", 10, '#', ConsoleColor.Blue, _container, 2, 2));
+            AddEntity(new StorageItem(2, "TestItem", "TestCategory", "TestDescription", 10, '¤', ConsoleColor.Red, _container, 8, 2));
+            AddEntity(new StorageItem(1, "TestItem", "TestCategory", "TestDescription", 10, '#', ConsoleColor.Blue, _container, 8, 5));
         }
 
         public void AddEntity(IEntity entity)
@@ -57,15 +62,10 @@ namespace WarehouseWorker.Managers
             else
                 direction = "down";
 
-            //Move the player if the target square is unoccupied
-            bool collision = false;
             int newX = _player.X + x;
             int newY = _player.Y + y;
-            //Check if any entity occupies the position you try to move to
-            if(_entities.Where(e => e.X == newX && e.Y == newY).Count() > 0)
-                collision = true;
 
-            if (!collision)
+            if (!CheckCollision(newX, newY))
             {
                 _player.MoveTo(newX, newY);
             }
@@ -73,14 +73,44 @@ namespace WarehouseWorker.Managers
             _player.SetDirection(direction);
         }
 
-        public void PickUpOrPutDownAt(int x, int y)
+        private bool CheckCollision(int x, int y)
+        {
+            if (_entities.Where(e => e.X == x && e.Y == y).Count() > 0)
+                return true;
+            return false;
+        }
+
+        private bool CheckInvalidAdjacency(ICarryable item, int x, int y)
+        {
+            if(item is IStorageItem)
+            {
+                List<IStorageItem> adjacentItems = new List<IStorageItem>();
+                foreach(IEntity entity in _entities)
+                {
+                    if(entity is IStorageItem)
+                    {
+                        if (Math.Abs(x - entity.X) <= 1 && Math.Abs(y - entity.Y) <= 1)
+                            adjacentItems.Add((IStorageItem)entity);
+                    }
+                }
+
+                if (adjacentItems.Where(i => i.ID != ((IStorageItem)item).ID).Count() > 0)
+                    return true;
+            }
+            return false;
+        }
+
+        public void InteractAt(int x, int y)
         {
             IEntity? item;
             if (_player.HeldItem != null)
             {
-                item = _player.PutDownItem(x, y);
-                if(item != null)
-                    _entities.Add(item);
+                if (!CheckCollision(x, y) && !CheckInvalidAdjacency(_player.HeldItem, x, y))
+                {
+                    item = _player.PutDownItem(x, y);
+                    if (item != null)
+                        _entities.Add(item); 
+                }
             }
             else
             {
@@ -92,8 +122,20 @@ namespace WarehouseWorker.Managers
                         _player.PickUpItem((ICarryable)item);
                         _entities.Remove(item);
                     }
+                    else if (item is IInteractable)
+                    {
+                        ((IInteractable)item).Interact();
+                    }
                 } 
             }
+        }
+
+        public void AddPlayer(IPlayerCharacter playerCharacter, int x, int y, string direction)
+        {
+            _player = playerCharacter;
+            _player.MoveTo(x, y);
+            _player.SetDirection(direction);
+            _container.MarkForRedraw(_player);
         }
     }
 }

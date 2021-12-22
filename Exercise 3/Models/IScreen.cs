@@ -2,9 +2,7 @@
 {
     internal interface IScreen
     {
-        int XMultiplier { get; }
-
-        void Draw();
+        void Show();
         void MarkForRedraw(IDrawable drawable);
         (int X, int Y) GetCursorTarget();
     }

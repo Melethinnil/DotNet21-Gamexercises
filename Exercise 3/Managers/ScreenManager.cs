@@ -28,9 +28,7 @@ namespace WarehouseWorker.Managers
         }
         public void Draw()
         {
-            CurrentScreen.Draw();
-            (int X, int Y) cursorTarget = CurrentScreen.GetCursorTarget();
-            Console.SetCursorPosition(cursorTarget.X, cursorTarget.Y);
+            CurrentScreen.Show();
         }
         public void ChangeScreen(IScreen screen)
         {
