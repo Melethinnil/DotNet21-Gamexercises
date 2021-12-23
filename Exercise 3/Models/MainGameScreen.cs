@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WarehouseWorker.Managers;
+﻿using WarehouseWorker.Managers;
 
 namespace WarehouseWorker.Models
 {
@@ -15,6 +10,9 @@ namespace WarehouseWorker.Models
         private (int x, int y) _computerLocation;
         public IStorageItem? ItemToOrder { get; private set; }
         private List<IDrawable> _toRedraw = new List<IDrawable>();
+        private (int x, int y) _conveyorLocation;
+        private (int x, int y) _incineratorLocation;
+
         public int RoomWidth { get; private set; }
         public int RoomHeight { get; private set; }
         public bool OrderingItems { get; private set; } = false;
@@ -25,7 +23,9 @@ namespace WarehouseWorker.Models
         {
             RoomWidth = roomWidth;
             RoomHeight = roomHeight;
-            _computerLocation = (roomWidth/2, RoomHeight-1);
+            _computerLocation = (7, RoomHeight - 1);
+            _conveyorLocation = (0, RoomHeight - 1);
+            _incineratorLocation = (RoomWidth / 2, 0);
             EntityManager = new EntityManager(this);
             Console.SetWindowSize(50, 50);
             Console.SetBufferSize(50, 50);
@@ -33,9 +33,8 @@ namespace WarehouseWorker.Models
             EntityManager.AddPlayer(new PlayerCharacter("Amanda", 'A', ConsoleColor.Green, this), _computerLocation.x, _computerLocation.y+1, "down");
         }
 
-        internal void OrderItem(IStorageItem storageItem)
+        internal void StartOrdering()
         {
-            ItemToOrder = storageItem;
             OrderingItems = true;
         }
 
@@ -74,9 +73,29 @@ namespace WarehouseWorker.Models
 
             //Item ordering computer
             EntityManager.AddEntity(new StorageComputer('@', ConsoleColor.Yellow, this, _computerLocation.x, _computerLocation.y));
+
+            //Conveyor belt
+            EntityManager.AddEntity(new Conveyor('╩', _conveyorLocation.x, _conveyorLocation.y - 1, this));
+            EntityManager.AddEntity(new Conveyor(' ', _conveyorLocation.x, _conveyorLocation.y, this));
+            EntityManager.AddEntity(new Conveyor('╦', _conveyorLocation.x, _conveyorLocation.y + 1, this));
+            EntityManager.AddEntity(new Conveyor('═', _conveyorLocation.x+1, _conveyorLocation.y+1, this));
+            EntityManager.AddEntity(new Conveyor('═', _conveyorLocation.x + 2, _conveyorLocation.y+1, this));
+            EntityManager.AddEntity(new Conveyor('═', _conveyorLocation.x + 3, _conveyorLocation.y+1, this));
+            EntityManager.AddEntity(new Conveyor('═', _conveyorLocation.x + 4, _conveyorLocation.y+1, this));
+            EntityManager.AddEntity(new Conveyor(':', _conveyorLocation.x + 4, _conveyorLocation.y, this));
+            EntityManager.AddEntity(new Conveyor('╝', _conveyorLocation.x + 5, _conveyorLocation.y+1, this));
+            EntityManager.AddEntity(new Conveyor('║', _conveyorLocation.x + 5, _conveyorLocation.y, this));
+
+            //Incinerator
+            EntityManager.AddEntity(new Incinerator('X', _incineratorLocation.x, _incineratorLocation.y, this, EntityManager));
+
+            //Exit door
+            EntityManager.AddEntity(new Wall('╠', RoomWidth + 1, RoomHeight - 1, this));
+            EntityManager.AddEntity(new Door('\\', RoomWidth + 1, RoomHeight, this));
+            EntityManager.AddEntity(new Wall('═', RoomWidth + 1, RoomHeight + 1, this));
         }
 
-        public void Show()
+        public IScreen Show()
         {
             foreach (IDrawable drawable in _toRedraw)
                 drawable.Draw();
@@ -85,10 +104,8 @@ namespace WarehouseWorker.Models
 
             if(OrderingItems)
             {
-                Console.SetCursorPosition(0, RoomHeight + 3);
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("### ORDER ITEM ###");
-                Console.Write("ID: ");
+                ClearInputArea();
+                OrderItem();
             }
             else
             {
@@ -121,7 +138,113 @@ namespace WarehouseWorker.Models
                         break;
                 }
             }
+
+            return this;
         }
+
+        private void OrderItem()
+        {
+            //Get product ID from user
+            int ID = 0;
+            while (ID < 1)
+            {
+                ClearInputArea();
+                Console.WriteLine("### ORDER ITEM ###");
+                Console.Write("ID: ");
+                int.TryParse(Console.ReadLine(), out ID);
+                if (ID < 1)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\nInvalid ID.\nTry again.");
+                    Console.ReadLine();
+                }
+            }
+
+            StorageItem? item = null;
+            //If ID has been ordered before, order another one, otherwise fill in the rest of the information
+            if (EntityManager.ItemExists(ID))
+            {
+                StorageItem existingItem = EntityManager.GetItem(ID);
+                item = new StorageItem(existingItem.ID, existingItem.Name, existingItem.Category, existingItem.Description, existingItem.Price, existingItem.Symbol, this, _conveyorLocation.x, _conveyorLocation.y);
+            }
+            else
+            {
+                //Get product name from user
+                string name = "";
+                while (name == "")
+                {
+                    ClearInputArea();
+                    Console.WriteLine("### ORDER ITEM ###");
+                    Console.Write("Name: ");
+                    name = Console.ReadLine() ?? "";
+                    if (name == "")
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\nYou must enter a product name.");
+                        Console.ReadLine();
+                    }
+                }
+                //Get product category from user
+                string category = "";
+                while (category == "")
+                {
+                    ClearInputArea();
+                    Console.WriteLine("### ORDER ITEM ###");
+                    Console.Write("Category: ");
+                    category = Console.ReadLine() ?? "";
+                    if (category == "")
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\nYou must enter a category.");
+                        Console.ReadLine();
+                    }
+                }
+                //Get product description from user
+                ClearInputArea();
+                Console.WriteLine("### ORDER ITEM ###");
+                Console.Write("Description: ");
+                string description = Console.ReadLine() ?? "";
+                //Get product price from user
+                int price = 0;
+                while (price < 1)
+                {
+                    ClearInputArea();
+                    Console.WriteLine("### ORDER ITEM ###");
+                    Console.Write("Price: ");
+                    int.TryParse(Console.ReadLine(), out price);
+                    if (price < 1)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\nPrice must be greater than 0.");
+                        Console.ReadLine();
+                    }
+                }
+                //Get a random unique symbol/color combination
+                ColoredSymbol symbol = EntityManager.RandomSymbol();
+
+                item = new StorageItem(ID, name, category, description, price, symbol, this, _conveyorLocation.x, _conveyorLocation.y);
+            }
+
+            if(item != null)
+                EntityManager.OrderItem(item);
+
+            ClearInputArea();
+            OrderingItems = false;
+        }
+
+        private void ClearInputArea()
+        {
+            Console.SetCursorPosition(0, RoomHeight + 3);
+            Console.WriteLine("".PadRight(Console.BufferWidth));
+            Console.WriteLine("".PadRight(Console.BufferWidth));
+            Console.WriteLine("".PadRight(Console.BufferWidth));
+            Console.WriteLine("".PadRight(Console.BufferWidth));
+            Console.WriteLine("".PadRight(Console.BufferWidth));
+
+            Console.SetCursorPosition(0, RoomHeight + 3);
+            Console.ForegroundColor = ConsoleColor.Yellow;
+        }
+
         public void MarkForRedraw(IDrawable drawable)
         {
             _toRedraw.Add(drawable);

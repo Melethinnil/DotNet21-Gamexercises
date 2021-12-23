@@ -19,10 +19,6 @@ namespace WarehouseWorker.Models
         public int X { get; set; }
         public int Y { get; set; }
 
-        public char Symbol { get; private set; }
-
-        public ConsoleColor Color { get; private set; }
-
         public IScreen ContainerScreen { get; private set; }
 
         public int ID { get; private set; }
@@ -35,6 +31,8 @@ namespace WarehouseWorker.Models
 
         public int Price { get; private set; }
 
+        public ColoredSymbol Symbol { get; private set; }
+
         public StorageItem(int id, string name, string category, string description, int price, char symbol, ConsoleColor color, IScreen screen, int x = 0, int y = 0)
         {
             ID = id;
@@ -42,8 +40,19 @@ namespace WarehouseWorker.Models
             Category = category;
             Description = description;
             Price = price;
+            Symbol = new ColoredSymbol(symbol, color);
+            ContainerScreen = screen;
+            X = x;
+            Y = y;
+        }
+        public StorageItem(int id, string name, string category, string description, int price, ColoredSymbol symbol, IScreen screen, int x = 0, int y = 0)
+        {
+            ID = id;
+            Name = name;
+            Category = category;
+            Description = description;
+            Price = price;
             Symbol = symbol;
-            Color = color;
             ContainerScreen = screen;
             X = x;
             Y = y;
@@ -55,8 +64,7 @@ namespace WarehouseWorker.Models
             Category = String.Empty;
             Description = String.Empty;
             Price = 0;
-            Symbol = ' ';
-            Color = ConsoleColor.White;
+            Symbol = new ColoredSymbol(' ', ConsoleColor.White);
             ContainerScreen= screen;
             X = 0;
             Y = 0;
@@ -65,8 +73,8 @@ namespace WarehouseWorker.Models
         public void Draw()
         {
             Console.SetCursorPosition(X, Y);
-            Console.ForegroundColor = Color;
-            Console.Write(Symbol);
+            Console.ForegroundColor = Symbol.Color;
+            Console.Write(Symbol.Symbol);
         }
 
         public void MoveTo(int x, int y)

@@ -17,18 +17,64 @@ namespace WarehouseWorker.Managers
         IPlayerCharacter GetPlayer();
         void InteractAt(int x, int y);
         void AddPlayer(IPlayerCharacter playerCharacter, int x, int y, string direction);
+        void OrderItem(IStorageItem item);
+        StorageItem? GetItem(int iD);
+        bool ItemExists(int iD);
+        ColoredSymbol RandomSymbol();
+        void DestroyHeldItem();
     }
 
     internal class EntityManager : IEntityManager
     {
         private IPlayerCharacter _player;
         private IScreen _container;
+        private List<ColoredSymbol> _uniqueSymbols = new List<ColoredSymbol>();
         private List<IEntity> _entities = new List<IEntity>();
+        private List<IEntity> _orderQueue = new List<IEntity>();
+        private List<IStorageItem> _uniqueItems = new List<IStorageItem>();
 
         public EntityManager(IScreen container)
         {
             _container = container;
-            AddTestEntities();
+            //AddTestEntities();
+            SetupRandomSymbol();
+        }
+
+        private void SetupRandomSymbol()
+        {
+            List<char> symbols = new List<char>()
+            {
+                '#',
+                '£',
+                '¤',
+                '$',
+                '%',
+                '&',
+                '=',
+                '+',
+                '€',
+                '©',
+                '®',
+                '+',
+                '*'
+            };
+            List <ConsoleColor> colors = new List<ConsoleColor>()
+            { 
+                ConsoleColor.Green,
+                ConsoleColor.Red,
+                ConsoleColor.DarkYellow,
+                ConsoleColor.Blue,
+                ConsoleColor.Magenta,
+                ConsoleColor.Cyan,
+            };
+
+            foreach (char symbol in symbols)
+            {
+                foreach(ConsoleColor color in colors)
+                {
+                    _uniqueSymbols.Add(new ColoredSymbol(symbol, color));
+                }
+            }
         }
 
         private void AddTestEntities()
@@ -75,8 +121,13 @@ namespace WarehouseWorker.Managers
 
         private bool CheckCollision(int x, int y)
         {
-            if (_entities.Where(e => e.X == x && e.Y == y).Count() > 0)
+            List<IEntity> items = _entities.Where(e => e.X == x && e.Y == y).ToList();
+            items.AddRange(_orderQueue.Where(e => e.X == x && e.Y == y).ToList());
+            if (items.Count() > 0)
+            {
+                //ADD CHECK TO ALLOW WALKING INTO THE EXIT DOOR
                 return true;
+            }
             return false;
         }
 
@@ -102,25 +153,33 @@ namespace WarehouseWorker.Managers
 
         public void InteractAt(int x, int y)
         {
-            IEntity? item;
             if (_player.HeldItem != null)
             {
                 if (!CheckCollision(x, y) && !CheckInvalidAdjacency(_player.HeldItem, x, y))
                 {
-                    item = _player.PutDownItem(x, y);
+                    IEntity? item = _player.PutDownItem(x, y);
                     if (item != null)
                         _entities.Add(item); 
+                }
+                else
+                {
+                    IEntity? item = _entities.FindLast(e => e.X == x && e.Y == y);
+                    if (item is IInteractable)
+                        ((IInteractable)item).Interact();
                 }
             }
             else
             {
-                item = _entities.Find(e => e.X == x && e.Y == y);
+                List<IEntity> items = _entities.Where(e => e.X == x && e.Y == y).ToList();
+                items.AddRange(_orderQueue.Where(e => e.X == x && e.Y == y).ToList());
+                IEntity? item = items.LastOrDefault();
                 if (item != null)
                 {
-                    if (item is ICarryable)
+                    if (item is ICarryable && _player.HeldItem == null)
                     {
                         _player.PickUpItem((ICarryable)item);
                         _entities.Remove(item);
+                        _orderQueue.Remove(item);
                     }
                     else if (item is IInteractable)
                     {
@@ -136,6 +195,51 @@ namespace WarehouseWorker.Managers
             _player.MoveTo(x, y);
             _player.SetDirection(direction);
             _container.MarkForRedraw(_player);
+        }
+
+        public void OrderItem(IStorageItem item)
+        {
+            if (_orderQueue.Count < 3)
+            {
+                _orderQueue.Add(item);
+                if (!_uniqueItems.Contains(item))
+                    _uniqueItems.Add(item);
+                foreach (IStorageItem queueItem in _orderQueue)
+                    queueItem.MoveTo(queueItem.X + 1, queueItem.Y);
+                _container.MarkForRedraw(item); 
+            }
+        }
+
+        public StorageItem? GetItem(int iD)
+        {
+            return _uniqueItems.Find(x => x.ID == iD) as StorageItem;
+        }
+
+        public bool ItemExists(int id)
+        {
+            return _uniqueItems.Where(x => x.ID == id).Count() > 0;
+        }
+
+        public ColoredSymbol RandomSymbol()
+        {
+            Random random = new Random(DateTime.Now.Second);
+            ColoredSymbol symbol = _uniqueSymbols[random.Next(0, _uniqueSymbols.Count)];
+            _uniqueSymbols.Remove(symbol);
+            return symbol;
+        }
+
+        public void DestroyHeldItem()
+        {
+            IStorageItem? item = _player.HeldItem as IStorageItem;
+            if(item != null)
+            {
+                _player.HeldItem = null;
+                _entities.Remove(item);
+
+                List<IStorageItem> items = _entities.Where(x => x.GetType() == typeof(IStorageItem)).Select(x => (IStorageItem)x).ToList();
+                if(items.Where(x => x.ID == item.ID).Count() <1)
+                    _uniqueItems.Remove(_uniqueItems.Find(x => x.ID == item.ID));
+            }
         }
     }
 }

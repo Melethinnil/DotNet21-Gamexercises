@@ -5,8 +5,7 @@
     /// </summary>
     internal interface IDrawable
     {
-        char Symbol { get; }
-        ConsoleColor Color { get; }
+        public ColoredSymbol Symbol { get; }
         IScreen ContainerScreen { get; }
 
         void Draw();

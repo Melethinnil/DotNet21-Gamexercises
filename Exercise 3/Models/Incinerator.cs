@@ -1,26 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using WarehouseWorker.Managers;
 
 namespace WarehouseWorker.Models
 {
-    internal class StorageComputer : IInteractable
+    internal class Incinerator : IInteractable
     {
+        private IEntityManager _entityManager;
         public int X { get; set; }
         public int Y { get; set; }
-
+        public ColoredSymbol Symbol {get; private set;}
         public IScreen ContainerScreen { get; private set; }
-
-        public ColoredSymbol Symbol { get; private set; }
-
-        public StorageComputer(char symbol, ConsoleColor color, IScreen screen, int x = 0, int y = 0)
+        public Incinerator(char symbol, int x, int y, IScreen screen, IEntityManager entityManager)
         {
-            Symbol = new ColoredSymbol(symbol, color);
-            ContainerScreen = screen;
+            Symbol = new ColoredSymbol(symbol, ConsoleColor.DarkRed);
             X = x;
             Y = y;
+            ContainerScreen = screen;
+            _entityManager = entityManager;
         }
 
         public void Draw()
@@ -28,14 +23,6 @@ namespace WarehouseWorker.Models
             Console.SetCursorPosition(X, Y);
             Console.ForegroundColor = Symbol.Color;
             Console.Write(Symbol.Symbol);
-        }
-
-        public void Interact()
-        {
-            if(ContainerScreen is MainGameScreen screen)
-            {
-                screen.StartOrdering();
-            }
         }
 
         public void MoveTo(int x, int y)
@@ -50,6 +37,11 @@ namespace WarehouseWorker.Models
         {
             Console.SetCursorPosition(X, Y);
             Console.Write(' ');
+        }
+
+        public void Interact()
+        {
+            _entityManager.DestroyHeldItem();
         }
     }
 }

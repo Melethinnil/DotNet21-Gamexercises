@@ -28,12 +28,7 @@ namespace WarehouseWorker.Managers
         }
         public void Draw()
         {
-            CurrentScreen.Show();
-        }
-        public void ChangeScreen(IScreen screen)
-        {
-            if (screen != null)
-                CurrentScreen = screen;
+            CurrentScreen = CurrentScreen.Show();
         }
     }
 }

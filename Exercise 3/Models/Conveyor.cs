@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WarehouseWorker.Models
 {
-    internal class StorageComputer : IInteractable
+    internal class Conveyor : IEntity
     {
         public int X { get; set; }
         public int Y { get; set; }
@@ -15,12 +15,12 @@ namespace WarehouseWorker.Models
 
         public ColoredSymbol Symbol { get; private set; }
 
-        public StorageComputer(char symbol, ConsoleColor color, IScreen screen, int x = 0, int y = 0)
+        public Conveyor(char symbol, int x, int y, IScreen container)
         {
-            Symbol = new ColoredSymbol(symbol, color);
-            ContainerScreen = screen;
+            Symbol = new ColoredSymbol(symbol, ConsoleColor.DarkYellow);
             X = x;
             Y = y;
+            ContainerScreen = container;
         }
 
         public void Draw()
@@ -30,26 +30,14 @@ namespace WarehouseWorker.Models
             Console.Write(Symbol.Symbol);
         }
 
-        public void Interact()
-        {
-            if(ContainerScreen is MainGameScreen screen)
-            {
-                screen.StartOrdering();
-            }
-        }
-
         public void MoveTo(int x, int y)
         {
-            Undraw();
-            X = x;
-            Y = y;
-            ContainerScreen.MarkForRedraw(this);
+            throw new NotImplementedException();
         }
 
         public void Undraw()
         {
-            Console.SetCursorPosition(X, Y);
-            Console.Write(' ');
+            throw new NotImplementedException();
         }
     }
 }

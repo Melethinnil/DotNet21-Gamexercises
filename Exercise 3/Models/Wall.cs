@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 
 namespace WarehouseWorker.Models
 {
-    internal class Wall : IDrawable, IEntity
+    internal class Wall : IEntity
     {
-        public char Symbol { get; private set; }
-        public ConsoleColor Color { get; private set; } = ConsoleColor.DarkGray;
         public int X { get; set; }
         public int Y { get; set; }
 
         public IScreen ContainerScreen { get; private set; }
 
+        public ColoredSymbol Symbol { get; private set; }
+
         public Wall(char symbol, int x, int y, IScreen container)
         { 
-            Symbol = symbol;
+            Symbol = new ColoredSymbol(symbol, ConsoleColor.DarkGray);
             X = x;
             Y = y;
             ContainerScreen = container;
@@ -26,8 +26,8 @@ namespace WarehouseWorker.Models
         public void Draw()
         {
             Console.SetCursorPosition(X, Y);
-            Console.ForegroundColor = Color;
-            Console.Write(Symbol);
+            Console.ForegroundColor = Symbol.Color;
+            Console.Write(Symbol.Symbol);
         }
 
         public void Undraw()

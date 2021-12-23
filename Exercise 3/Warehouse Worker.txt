@@ -28,6 +28,4 @@ When you exit the storage floor, the product list is saved to a csv file in the 
 
 At the start of the game, you choose your "character" from a set of symbols of different colors
 
-Add a note in the intro screen to set the console font to Raster 8x8 (or 12x16 if it becomes too small)
-
-Skip InputManager entirely, let each Screen handle input directly intermixed with its graphics drawing
+Add a note in the intro screen to set the console font to Raster 12x16 or 8x8

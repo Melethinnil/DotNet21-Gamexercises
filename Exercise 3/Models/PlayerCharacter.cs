@@ -32,25 +32,28 @@ namespace WarehouseWorker.Models
 
         public string Name { get; private set; }
 
-        public char Symbol { get; private set; }
-
-        public ConsoleColor Color { get; private set; }
-
         public ICarryable? HeldItem { get; set; }
+
+        public ColoredSymbol Symbol { get; private set; }
 
         public PlayerCharacter(string name, char symbol, ConsoleColor color, IScreen container)
         {
             Name = name;
+            Symbol = new ColoredSymbol(symbol, color);
+            ContainerScreen = container;
+        }
+        public PlayerCharacter(string name, ColoredSymbol symbol, IScreen container)
+        {
+            Name = name;
             Symbol = symbol;
-            Color = color;
             ContainerScreen = container;
         }
 
         public void Draw()
         {
             Console.SetCursorPosition(X, Y);
-            Console.ForegroundColor = Color;
-            Console.Write(Symbol);
+            Console.ForegroundColor = Symbol.Color;
+            Console.Write(Symbol.Symbol);
         }
 
         public void MoveTo(int x, int y)
