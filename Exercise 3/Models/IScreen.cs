@@ -8,6 +8,5 @@
         /// <returns>The screen to switch to.</returns>
         IScreen Show();
         void MarkForRedraw(IDrawable drawable);
-        (int X, int Y) GetCursorTarget();
     }
 }

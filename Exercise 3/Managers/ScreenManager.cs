@@ -25,6 +25,8 @@ namespace WarehouseWorker.Managers
         {
             CurrentScreen = screen;
             Console.CursorSize = 100;
+            Console.SetWindowSize(60, 30);
+            Console.SetBufferSize(60, 30);
         }
         public void Draw()
         {

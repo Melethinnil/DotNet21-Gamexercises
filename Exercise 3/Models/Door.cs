@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WarehouseWorker.Models
 {
-    internal class Door : IEntity
+    internal class Door : IInteractable
     {
         public int X { get; set; }
         public int Y { get; set; }
@@ -38,6 +38,14 @@ namespace WarehouseWorker.Models
         public void Undraw()
         {
             throw new NotImplementedException();
+        }
+
+        public void Interact()
+        {
+            if (ContainerScreen is MainGameScreen screen)
+            {
+                screen.ExitGame();
+            }
         }
     }
 }

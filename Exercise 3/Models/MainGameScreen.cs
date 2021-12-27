@@ -12,6 +12,9 @@ namespace WarehouseWorker.Models
         private List<IDrawable> _toRedraw = new List<IDrawable>();
         private (int x, int y) _conveyorLocation;
         private (int x, int y) _incineratorLocation;
+        private bool _firstDraw = true;
+        private DateTime _startTime;
+        private bool _exit = false;
 
         public int RoomWidth { get; private set; }
         public int RoomHeight { get; private set; }
@@ -19,7 +22,7 @@ namespace WarehouseWorker.Models
 
         public IEntityManager EntityManager { get; private set; }
 
-        public MainGameScreen(int roomWidth, int roomHeight)
+        public MainGameScreen(int roomWidth, int roomHeight, string playerName, ColoredSymbol playerSymbol)
         {
             RoomWidth = roomWidth;
             RoomHeight = roomHeight;
@@ -27,10 +30,14 @@ namespace WarehouseWorker.Models
             _conveyorLocation = (0, RoomHeight - 1);
             _incineratorLocation = (RoomWidth / 2, 0);
             EntityManager = new EntityManager(this);
-            Console.SetWindowSize(50, 50);
-            Console.SetBufferSize(50, 50);
             BuildRoom();
-            EntityManager.AddPlayer(new PlayerCharacter("Amanda", 'A', ConsoleColor.Green, this), _computerLocation.x, _computerLocation.y+1, "down");
+            EntityManager.AddPlayer(new PlayerCharacter(playerName, playerSymbol, this), _computerLocation.x, _computerLocation.y+1, "down");
+            Console.Clear();
+        }
+
+        internal void ExitGame()
+        {
+            _exit = true;
         }
 
         internal void StartOrdering()
@@ -97,6 +104,18 @@ namespace WarehouseWorker.Models
 
         public IScreen Show()
         {
+            if(_exit)
+            {
+                return new ScoreScreen(_startTime, EntityManager.CountTotalItems(), EntityManager.CountUniqueItems(), EntityManager.GetPlayer().Name);
+            }
+
+            if (_firstDraw)
+            {
+                Console.Clear();
+                _startTime = DateTime.Now;
+                _firstDraw = false;
+            }
+
             foreach (IDrawable drawable in _toRedraw)
                 drawable.Draw();
 
@@ -115,15 +134,24 @@ namespace WarehouseWorker.Models
                 IStorageItem? heldItem = EntityManager.GetHeldItem();
                 if(heldItem != null)
                 {
-                    ClearItemDetails();
+                    ClearSideBar();
                     ShowItemDetails(heldItem, "HELD ITEM");
                 }
                 else
                 {
                     //Get the item that the player is targeting, and list its details if it is a StorageItem
-                    IEntity? targetItem = EntityManager.GetItemAt(cursorTarget.X, cursorTarget.Y);
-                    ClearItemDetails();
-                    ShowItemDetails(targetItem as IStorageItem, "TARGETED ITEM");
+                    IStorageItem? targetItem = EntityManager.GetItemAt(cursorTarget.X, cursorTarget.Y);
+                    if (targetItem != null)
+                    {
+                        ClearSideBar();
+                        ShowItemDetails(targetItem, "TARGETED ITEM"); 
+                    }
+                    else
+                    {
+                        //Show a list of all unique items in storage
+                        ClearSideBar();
+                        ShowItemList();
+                    }
                 }
 
                 Console.SetCursorPosition(cursorTarget.X, cursorTarget.Y);
@@ -150,6 +178,9 @@ namespace WarehouseWorker.Models
                         x = 1;
                         EntityManager.MovePlayer(x, y, RoomWidth + 1, RoomHeight + 1, 1, 1);
                         break;
+                    case ConsoleKey.Enter:
+                        EntityManager.InteractAt(Console.CursorLeft, Console.CursorTop);
+                        break;
                     case ConsoleKey.Spacebar:
                         EntityManager.InteractAt(Console.CursorLeft, Console.CursorTop);
                         break;
@@ -157,6 +188,27 @@ namespace WarehouseWorker.Models
             }
 
             return this;
+        }
+
+        private void ShowItemList()
+        {
+            int x = RoomWidth + 2;
+            int maxWidth = Console.BufferWidth - RoomWidth - 2;
+            List<IStorageItem>? items = EntityManager.GetUniqueItems().ToList();
+
+            if (items != null)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.SetCursorPosition(x, 0);
+                Console.Write(CenteredString("ITEMS IN STORAGE", '#', maxWidth));
+                for (int i = 0; i < items.Count(); i++)
+                {
+                    IStorageItem item = items[i];
+                    int count = EntityManager.CountItemsByID(item.ID);
+                    Console.SetCursorPosition(x, i + 1);
+                    Console.Write(TruncatedString($"{count} x {item.ID}: {item.Name}, {item.Description}", maxWidth));
+                } 
+            }
         }
 
         private void ShowItemDetails(IStorageItem? item, string header)
@@ -181,22 +233,15 @@ namespace WarehouseWorker.Models
             }
         }
 
-        private void ClearItemDetails()
+        private void ClearSideBar()
         {
             int x = RoomWidth + 2;
             int maxWidth = Console.BufferWidth - RoomWidth - 2;
-            Console.SetCursorPosition(x, 0);
-            Console.Write("".PadRight(maxWidth, ' '));
-            Console.SetCursorPosition(x, 1);
-            Console.Write("".PadRight(maxWidth, ' '));
-            Console.SetCursorPosition(x, 2);
-            Console.Write("".PadRight(maxWidth, ' '));
-            Console.SetCursorPosition(x, 3);
-            Console.Write("".PadRight(maxWidth, ' '));
-            Console.SetCursorPosition(x, 4);
-            Console.Write("".PadRight(maxWidth, ' '));
-            Console.SetCursorPosition(x, 5);
-            Console.Write("".PadRight(maxWidth, ' '));
+            for(int i = 0; i < Console.BufferHeight; i++)
+            {
+                Console.SetCursorPosition(x, i);
+                Console.Write("".PadRight(maxWidth, ' '));
+            }
         }
 
         private string TruncatedString(string str, int maxWidth)
@@ -252,6 +297,13 @@ namespace WarehouseWorker.Models
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("\nYou must enter a product name.");
+                        Console.ReadLine();
+                    }
+                    else if(EntityManager.ItemExists(name))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\nProduct name must be unique.\nTry again.");
+                        name = "";
                         Console.ReadLine();
                     }
                 }

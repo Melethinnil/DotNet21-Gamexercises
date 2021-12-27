@@ -13,7 +13,7 @@ SetConsoleCP(65001);
 
 //Console.CursorVisible = false;
 
-ScreenManager sm = new ScreenManager(new MainGameScreen(16, 12));
+ScreenManager sm = new ScreenManager(new LogoScreen());
 
 while(true)
 {

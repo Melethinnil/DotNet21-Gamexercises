@@ -22,8 +22,13 @@ namespace WarehouseWorker.Managers
         bool ItemExists(int iD);
         ColoredSymbol RandomSymbol();
         void DestroyHeldItem();
-        IEntity? GetItemAt(int x, int y);
+        IStorageItem? GetItemAt(int x, int y);
         IStorageItem? GetHeldItem();
+        IEnumerable<IStorageItem> GetUniqueItems();
+        int CountItemsByID(int iD);
+        int CountUniqueItems();
+        int CountTotalItems();
+        bool ItemExists(string name);
     }
 
     internal class EntityManager : IEntityManager
@@ -204,7 +209,7 @@ namespace WarehouseWorker.Managers
             if (_orderQueue.Count < 3)
             {
                 _orderQueue.Add(item);
-                if (!_uniqueItems.Contains(item))
+                if (_uniqueItems.Where(i => i.ID == item.ID).Count() < 1)
                     _uniqueItems.Add(item);
                 foreach (IStorageItem queueItem in _orderQueue)
                     queueItem.MoveTo(queueItem.X + 1, queueItem.Y);
@@ -238,23 +243,50 @@ namespace WarehouseWorker.Managers
                 _player.HeldItem = null;
                 _entities.Remove(item);
 
-                List<IStorageItem> items = _entities.Where(x => x.GetType() == typeof(IStorageItem)).Select(x => (IStorageItem)x).ToList();
-                items.AddRange(_orderQueue.Select(x => (IStorageItem)x));
-                if(items.Where(x => x.ID == item.ID).Count() <1)
+                List<IStorageItem> items = _entities.OfType<IStorageItem>().ToList();
+                items.AddRange(_orderQueue.OfType<IStorageItem>());
+                if (items.Where(x => x.ID == item.ID).Count() <1)
                     _uniqueItems.Remove(_uniqueItems.Find(x => x.ID == item.ID));
             }
         }
 
-        public IEntity? GetItemAt(int x, int y)
+        public IStorageItem? GetItemAt(int x, int y)
         {
             List<IEntity> items = new List<IEntity>(_entities);
             items.AddRange(_orderQueue);
-            return items.FindLast(e => e.X == x && e.Y == y);
+            return items.FindLast(e => e.X == x && e.Y == y) as IStorageItem;
         }
 
         public IStorageItem? GetHeldItem()
         {
             return _player.HeldItem as IStorageItem;
+        }
+
+        public IEnumerable<IStorageItem> GetUniqueItems()
+        {
+            return _uniqueItems;
+        }
+
+        public int CountItemsByID(int iD)
+        {
+            List<IStorageItem> items = _entities.OfType<IStorageItem>().ToList();
+            //items.AddRange(_orderQueue.OfType<IStorageItem>());
+            return items.Where(i => i.ID == iD).Count();
+        }
+
+        public int CountUniqueItems()
+        {
+            return _entities.Intersect(_uniqueItems).Count();
+        }
+
+        public int CountTotalItems()
+        {
+            return _entities.OfType<IStorageItem>().ToList().Count();
+        }
+
+        public bool ItemExists(string name)
+        {
+            return _uniqueItems.Where(x => x.Name == name).Count() > 0;
         }
     }
 }
