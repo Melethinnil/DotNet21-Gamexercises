@@ -22,6 +22,8 @@ namespace WarehouseWorker.Managers
         bool ItemExists(int iD);
         ColoredSymbol RandomSymbol();
         void DestroyHeldItem();
+        IEntity? GetItemAt(int x, int y);
+        IStorageItem? GetHeldItem();
     }
 
     internal class EntityManager : IEntityManager
@@ -237,9 +239,22 @@ namespace WarehouseWorker.Managers
                 _entities.Remove(item);
 
                 List<IStorageItem> items = _entities.Where(x => x.GetType() == typeof(IStorageItem)).Select(x => (IStorageItem)x).ToList();
+                items.AddRange(_orderQueue.Select(x => (IStorageItem)x));
                 if(items.Where(x => x.ID == item.ID).Count() <1)
                     _uniqueItems.Remove(_uniqueItems.Find(x => x.ID == item.ID));
             }
+        }
+
+        public IEntity? GetItemAt(int x, int y)
+        {
+            List<IEntity> items = new List<IEntity>(_entities);
+            items.AddRange(_orderQueue);
+            return items.FindLast(e => e.X == x && e.Y == y);
+        }
+
+        public IStorageItem? GetHeldItem()
+        {
+            return _player.HeldItem as IStorageItem;
         }
     }
 }

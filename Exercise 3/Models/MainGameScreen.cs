@@ -110,8 +110,25 @@ namespace WarehouseWorker.Models
             else
             {
                 (int X, int Y) cursorTarget = GetCursorTarget();
+
+                //Get the held item, if any, and list its details
+                IStorageItem? heldItem = EntityManager.GetHeldItem();
+                if(heldItem != null)
+                {
+                    ClearItemDetails();
+                    ShowItemDetails(heldItem, "HELD ITEM");
+                }
+                else
+                {
+                    //Get the item that the player is targeting, and list its details if it is a StorageItem
+                    IEntity? targetItem = EntityManager.GetItemAt(cursorTarget.X, cursorTarget.Y);
+                    ClearItemDetails();
+                    ShowItemDetails(targetItem as IStorageItem, "TARGETED ITEM");
+                }
+
                 Console.SetCursorPosition(cursorTarget.X, cursorTarget.Y);
 
+                //Read player input
                 ConsoleKey key = Console.ReadKey(true).Key;
                 int x = 0;
                 int y = 0;
@@ -140,6 +157,60 @@ namespace WarehouseWorker.Models
             }
 
             return this;
+        }
+
+        private void ShowItemDetails(IStorageItem? item, string header)
+        {
+            if(item != null)
+            {
+                int x = RoomWidth + 2;
+                int maxWidth = Console.BufferWidth - RoomWidth - 2;
+                Console.ForegroundColor = item.Symbol.Color;
+                Console.SetCursorPosition(x, 0);
+                Console.Write(CenteredString(header, '#', maxWidth));
+                Console.SetCursorPosition(x, 1);
+                Console.Write(TruncatedString("ID: " + item.ID, maxWidth));
+                Console.SetCursorPosition(x, 2);
+                Console.Write(TruncatedString("Name: " + item.Name, maxWidth));
+                Console.SetCursorPosition(x, 3);
+                Console.Write(TruncatedString("Cat: " + item.Category, maxWidth));
+                Console.SetCursorPosition(x, 4);
+                Console.Write(TruncatedString("Desc: " + item.Description, maxWidth));
+                Console.SetCursorPosition(x, 5);
+                Console.Write(TruncatedString("Price: " + item.Price, maxWidth));
+            }
+        }
+
+        private void ClearItemDetails()
+        {
+            int x = RoomWidth + 2;
+            int maxWidth = Console.BufferWidth - RoomWidth - 2;
+            Console.SetCursorPosition(x, 0);
+            Console.Write("".PadRight(maxWidth, ' '));
+            Console.SetCursorPosition(x, 1);
+            Console.Write("".PadRight(maxWidth, ' '));
+            Console.SetCursorPosition(x, 2);
+            Console.Write("".PadRight(maxWidth, ' '));
+            Console.SetCursorPosition(x, 3);
+            Console.Write("".PadRight(maxWidth, ' '));
+            Console.SetCursorPosition(x, 4);
+            Console.Write("".PadRight(maxWidth, ' '));
+            Console.SetCursorPosition(x, 5);
+            Console.Write("".PadRight(maxWidth, ' '));
+        }
+
+        private string TruncatedString(string str, int maxWidth)
+        {
+            if(str.Length > maxWidth)
+                return str.Substring(0, maxWidth-3) + "...";
+            return str;
+        }
+
+        private string CenteredString(string str, char padding, int width)
+        {
+            str = TruncatedString(str, width - 2);
+            int left = (width - str.Length - 2) / 2;
+            return $" {str} ".PadRight(width - left, padding).PadLeft(width, padding);
         }
 
         private void OrderItem()
