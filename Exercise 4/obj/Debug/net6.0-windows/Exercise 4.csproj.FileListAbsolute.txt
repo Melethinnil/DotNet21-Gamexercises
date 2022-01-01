@@ -1,0 +1,21 @@
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\bin\Debug\net6.0-windows\Exercise 4.exe
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\bin\Debug\net6.0-windows\Exercise 4.deps.json
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\bin\Debug\net6.0-windows\Exercise 4.runtimeconfig.json
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\bin\Debug\net6.0-windows\Exercise 4.dll
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\bin\Debug\net6.0-windows\ref\Exercise 4.dll
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\bin\Debug\net6.0-windows\Exercise 4.pdb
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\obj\Debug\net6.0-windows\Exercise 4.csproj.AssemblyReference.cache
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\obj\Debug\net6.0-windows\MainWindow.g.cs
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\obj\Debug\net6.0-windows\App.g.cs
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\obj\Debug\net6.0-windows\Exercise 4_MarkupCompile.cache
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\obj\Debug\net6.0-windows\Exercise 4_MarkupCompile.lref
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\obj\Debug\net6.0-windows\MainWindow.baml
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\obj\Debug\net6.0-windows\Exercise 4.g.resources
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\obj\Debug\net6.0-windows\Exercise 4.GeneratedMSBuildEditorConfig.editorconfig
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\obj\Debug\net6.0-windows\Exercise 4.AssemblyInfoInputs.cache
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\obj\Debug\net6.0-windows\Exercise 4.AssemblyInfo.cs
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\obj\Debug\net6.0-windows\Exercise 4.csproj.CoreCompileInputs.cache
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\obj\Debug\net6.0-windows\Exercise 4.dll
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\obj\Debug\net6.0-windows\ref\Exercise 4.dll
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\obj\Debug\net6.0-windows\Exercise 4.pdb
+S:\OneDrive\IT-utbildning\Repository 2\Exercise 4\obj\Debug\net6.0-windows\Exercise 4.genruntimeconfig.cache
